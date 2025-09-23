@@ -1,9 +1,13 @@
-import 'dart:io';
-import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:get_it/get_it.dart';
+
+import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
+import 'package:movie_discovery_app/features/movies/data/repositories/movie_repository_impl.dart';
+import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/get_top_rated_movies.dart';
 
 final sl = GetIt.instance;
 
@@ -22,6 +26,20 @@ Future<void> _initExternalDependencies() async {
   // Register environment variables
   await dotenv.load(fileName: ".env");
   
+  // Register use cases
+  sl.registerFactory(() => GetPopularMovies(sl()));
+  sl.registerFactory(() => GetTopRatedMovies(sl()));
+  
+  // Register repositories
+  sl.registerLazySingleton<MovieRepository>(
+    () => MovieRepositoryImpl(remoteDataSource: sl()),
+  );
+  
+  // Register data sources
+  sl.registerLazySingleton<MovieRemoteDataSource>(
+    () => MovieRemoteDataSourceImpl(client: sl()),
+  );
+  
   // Register Dio with interceptors
   sl.registerLazySingleton<Dio>(() {
     final dio = Dio(
@@ -35,7 +53,6 @@ Future<void> _initExternalDependencies() async {
       ),
     );
 
-    // Add logging interceptor in debug mode
     if (kDebugMode) {
       dio.interceptors.add(
         LogInterceptor(
@@ -52,51 +69,5 @@ Future<void> _initExternalDependencies() async {
     return dio;
   });
 
-  // Register path_provider
-  sl.registerLazySingletonAsync<Directory>(() => getApplicationDocumentsDirectory());
-  
-  // Initialize Hive
-  // sl.registerLazySingletonAsync<Box>(
-  //   () async {
-  //     final appDocumentDir = await getApplicationDocumentsDirectory();
-  //     Hive.init(appDocumentDir.path);
-  //     return Hive.openBox('appBox');
-  //   },
-  // );
-  
-  // Initialize Drift database
-  // sl.registerLazySingletonAsync<AppDatabase>(
-  //   () async {
-  //     final dbFolder = await getApplicationDocumentsDirectory();
-  //     final file = File(path.join(dbFolder.path, 'db.sqlite'));
-  //     return AppDatabase(file);
-  //   },
-  // );
-  
-  // Initialize Secure Storage
-  // sl.registerLazySingleton<FlutterSecureStorage>(
-  //   () => const FlutterSecureStorage(),
-  // );
-}
-
-// Helper extension for async registration
-extension GetItX on GetIt {
-  void registerLazySingletonAsync<T extends Object>(
-    FactoryFuncAsync<T> factoryFunc, {
-    String? instanceName,
-    DisposingFunc<T>? dispose,
-  }) {
-    registerFactoryAsync(
-      () async {
-        final instance = await factoryFunc();
-        registerLazySingleton<T>(
-          () => instance,
-          instanceName: instanceName,
-          dispose: dispose,
-        );
-        return instance;
-      },
-      instanceName: instanceName,
-    );
-  }
+  // Database and storage initialization can be added here later
 }
