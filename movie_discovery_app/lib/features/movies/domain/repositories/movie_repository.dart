@@ -5,6 +5,6 @@ import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity
 abstract class MovieRepository {
   Future<Either<Failure, List<MovieEntity>>> getPopularMovies();
   Future<Either<Failure, List<MovieEntity>>> getTopRatedMovies();
-  Future<Either<Failure, List<MovieEntity>>> searchMovies(String query);
   Future<Either<Failure, MovieEntity>> getMovieDetails(int movieId);
+  Future<Either<Failure, List<MovieEntity>>> searchMovies(String query);
 }

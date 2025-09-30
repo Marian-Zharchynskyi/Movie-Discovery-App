@@ -1,8 +1,16 @@
 import 'package:dio/dio.dart';
-import 'package:movie_discovery_app/core/network/dio_config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
+import 'package:movie_discovery_app/core/network/dio_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:movie_discovery_app/features/favorites/data/datasources/local/favorites_local_data_source.dart';
+import 'package:movie_discovery_app/features/favorites/data/repositories/favorites_repository_impl.dart';
+import 'package:movie_discovery_app/features/favorites/domain/repositories/favorites_repository.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/add_to_favorites.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favorite_movies.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/is_favorite.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_from_favorites.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/repositories/movie_repository_impl.dart';
 import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
@@ -25,19 +33,33 @@ Future<void> init() async {
 Future<void> _initExternalDependencies() async {
   // Register environment variables
   await dotenv.load(fileName: ".env");
+
+  // Register SharedPreferences
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   
   // Register use cases
   sl.registerFactory(() => GetPopularMovies(sl()));
   sl.registerFactory(() => GetTopRatedMovies(sl()));
+  sl.registerFactory(() => GetFavoriteMovies(sl()));
+  sl.registerFactory(() => AddToFavorites(sl()));
+  sl.registerFactory(() => RemoveFromFavorites(sl()));
+  sl.registerFactory(() => IsFavorite(sl()));
   
   // Register repositories
   sl.registerLazySingleton<MovieRepository>(
     () => MovieRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<FavoritesRepository>(
+    () => FavoritesRepositoryImpl(localDataSource: sl()),
+  );
   
   // Register data sources
   sl.registerLazySingleton<MovieRemoteDataSource>(
     () => MovieRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<FavoritesLocalDataSource>(
+    () => FavoritesLocalDataSourceImpl(sharedPreferences: sl()),
   );
   
   // Register Dio with interceptors
