@@ -6,6 +6,7 @@ abstract class MovieRemoteDataSource {
   Future<List<MovieModel>> getPopularMovies();
   Future<List<MovieModel>> getTopRatedMovies();
   Future<MovieModel> getMovieDetails(int movieId);
+  Future<List<MovieModel>> searchMovies(String query);
 }
 
 class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
@@ -42,7 +43,7 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
       throw ServerException('Failed to load movie details: $e');
     }
   }
-  
+
   @override
   Future<List<MovieModel>> getTopRatedMovies() async {
     try {
@@ -56,6 +57,27 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
       }
     } catch (e) {
       throw ServerException('Failed to load top rated movies: $e');
+    }
+  }
+
+  @override
+  Future<List<MovieModel>> searchMovies(String query) async {
+    try {
+      final response = await client.get(
+        '/search/movie',
+        queryParameters: {
+          'query': query,
+        },
+      );
+      if (response.statusCode == 200) {
+        return (response.data['results'] as List)
+            .map((movie) => MovieModel.fromJson(movie))
+            .toList();
+      } else {
+        throw ServerException('Failed to search movies');
+      }
+    } catch (e) {
+      throw ServerException('Failed to search movies: $e');
     }
   }
 }

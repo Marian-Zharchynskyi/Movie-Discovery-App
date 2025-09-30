@@ -42,7 +42,11 @@ class MovieRepositoryImpl implements MovieRepository {
 
   @override
   Future<Either<Failure, List<MovieEntity>>> searchMovies(String query) async {
-    // Implementation for search will be added later
-    return const Left(ServerFailure('Not implemented'));
+    try {
+      final movies = await remoteDataSource.searchMovies(query);
+      return Right(movies);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
   }
 }
