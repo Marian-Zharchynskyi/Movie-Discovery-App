@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:movie_discovery_app/core/network/dio_config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 
@@ -42,31 +42,14 @@ Future<void> _initExternalDependencies() async {
   
   // Register Dio with interceptors
   sl.registerLazySingleton<Dio>(() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: dotenv.env['TMDB_BASE_URL']!,
-        queryParameters: {
-          'api_key': dotenv.env['TMDB_API_KEY'],
-        },
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-      ),
+    return DioConfig.createDio(
+      baseUrl: dotenv.env['TMDB_BASE_URL']!,
+      apiKey: dotenv.env['TMDB_API_KEY'],
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      enableLogging: true,
+      maxRetries: 3,
     );
-
-    if (kDebugMode) {
-      dio.interceptors.add(
-        LogInterceptor(
-          request: true,
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          responseBody: true,
-          error: true,
-        ),
-      );
-    }
-
-    return dio;
   });
 
   // Database and storage initialization can be added here later
