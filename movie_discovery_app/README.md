@@ -1,5 +1,7 @@
 # movie_discovery_app
 
+![Flutter CI](https://github.com/Marian-Zharchynskyi/Movie-Discovery-App/actions/workflows/flutter.yml/badge.svg)
+
 A new Flutter project.
 
 ## Getting Started
