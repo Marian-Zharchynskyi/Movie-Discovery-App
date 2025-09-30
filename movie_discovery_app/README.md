@@ -4,6 +4,16 @@
 
 A new Flutter project.
 
+## CI / CD
+
+- **Trigger branches**: pushes and pull requests targeting `main` or `develop` run the workflow at `.github/workflows/flutter.yml`.
+- **Continuous Integration**: executes `flutter analyze` and `flutter test --coverage`. The generated `coverage/lcov.info` file is uploaded as an artifact (`coverage-lcov`).
+- **Continuous Delivery (artifacts)**: builds
+  - `app-release-apk` at `build/app/outputs/flutter-apk/app-release.apk`
+  - `app-unsigned-ipa` at `build/ios/ipa/`
+  Download them from the run summary in the GitHub Actions tab for manual signing and store publishing.
+- **Next step**: integrate automated store uploads (e.g., Firebase App Distribution, App Store Connect) once signing credentials are available.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
