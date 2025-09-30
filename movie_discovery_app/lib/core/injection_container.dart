@@ -5,6 +5,7 @@ import 'package:movie_discovery_app/core/network/dio_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:movie_discovery_app/features/favorites/data/datasources/local/favorites_local_data_source.dart';
+import 'package:movie_discovery_app/features/favorites/data/datasources/local/drift/favorites_database.dart';
 import 'package:movie_discovery_app/features/favorites/data/repositories/favorites_repository_impl.dart';
 import 'package:movie_discovery_app/features/favorites/domain/repositories/favorites_repository.dart';
 import 'package:movie_discovery_app/features/favorites/domain/usecases/add_to_favorites.dart';
@@ -38,6 +39,9 @@ Future<void> _initExternalDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   
+  // Register database
+  sl.registerLazySingleton<FavoritesDatabase>(FavoritesDatabase.new);
+
   // Register use cases
   sl.registerFactory(() => GetPopularMovies(sl()));
   sl.registerFactory(() => GetTopRatedMovies(sl()));
@@ -59,7 +63,7 @@ Future<void> _initExternalDependencies() async {
     () => MovieRemoteDataSourceImpl(client: sl()),
   );
   sl.registerLazySingleton<FavoritesLocalDataSource>(
-    () => FavoritesLocalDataSourceImpl(sharedPreferences: sl()),
+    () => FavoritesLocalDataSourceImpl(database: sl()),
   );
   
   // Register Dio with interceptors

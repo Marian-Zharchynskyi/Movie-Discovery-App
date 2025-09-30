@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:movie_discovery_app/core/error/exceptions.dart';
+import 'package:movie_discovery_app/features/favorites/data/datasources/local/drift/favorites_database.dart';
 import 'package:movie_discovery_app/features/favorites/data/models/favorite_movie_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class FavoritesLocalDataSource {
   Future<List<FavoriteMovieModel>> getFavoriteMovies();
@@ -11,22 +10,14 @@ abstract class FavoritesLocalDataSource {
 }
 
 class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
-  static const String _favoritesKey = 'favorite_movies';
-  final SharedPreferences sharedPreferences;
+  final FavoritesDatabase database;
 
-  FavoritesLocalDataSourceImpl({required this.sharedPreferences});
+  FavoritesLocalDataSourceImpl({required this.database});
 
   @override
   Future<List<FavoriteMovieModel>> getFavoriteMovies() async {
     try {
-      final jsonString = sharedPreferences.getString(_favoritesKey);
-      if (jsonString != null) {
-        final List<dynamic> jsonList = json.decode(jsonString);
-        return jsonList
-            .map((json) => FavoriteMovieModel.fromJson(json))
-            .toList();
-      }
-      return [];
+      return await database.fetchFavoriteMovies();
     } catch (e) {
       throw CacheException('Failed to get favorite movies: $e');
     }
@@ -35,16 +26,7 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<bool> addToFavorites(FavoriteMovieModel movie) async {
     try {
-      final favorites = await getFavoriteMovies();
-
-      // Check if movie is already in favorites
-      if (favorites.any((fav) => fav.id == movie.id)) {
-        return false; // Already exists
-      }
-
-      favorites.add(movie);
-      final jsonString = json.encode(favorites.map((fav) => fav.toJson()).toList());
-      return await sharedPreferences.setString(_favoritesKey, jsonString);
+      return await database.insertFavoriteMovie(movie);
     } catch (e) {
       throw CacheException('Failed to add movie to favorites: $e');
     }
@@ -53,17 +35,7 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<bool> removeFromFavorites(int movieId) async {
     try {
-      final favorites = await getFavoriteMovies();
-      final initialLength = favorites.length;
-
-      favorites.removeWhere((fav) => fav.id == movieId);
-
-      if (favorites.length == initialLength) {
-        return false; // Movie wasn't in favorites
-      }
-
-      final jsonString = json.encode(favorites.map((fav) => fav.toJson()).toList());
-      return await sharedPreferences.setString(_favoritesKey, jsonString);
+      return await database.deleteFavoriteMovie(movieId);
     } catch (e) {
       throw CacheException('Failed to remove movie from favorites: $e');
     }
@@ -72,8 +44,7 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<bool> isFavorite(int movieId) async {
     try {
-      final favorites = await getFavoriteMovies();
-      return favorites.any((fav) => fav.id == movieId);
+      return await database.isFavoriteMovie(movieId);
     } catch (e) {
       throw CacheException('Failed to check if movie is favorite: $e');
     }
