@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Create .env file
+        run: echo "${{ secrets.DOT_ENV }}" > .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -29,6 +32,7 @@ jobs:
       - name: Flutter analyze
         run: flutter analyze
 
+
   test:
     name: Test with coverage
     runs-on: ubuntu-latest
@@ -36,6 +40,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: echo "${{ secrets.DOT_ENV }}" > .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -63,6 +70,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: echo "${{ secrets.DOT_ENV }}" > .env
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -88,6 +98,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: echo "${{ secrets.DOT_ENV }}" > .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
