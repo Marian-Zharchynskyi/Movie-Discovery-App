@@ -32,7 +32,6 @@ jobs:
       - name: Flutter analyze
         run: flutter analyze
 
-
   test:
     name: Test with coverage
     runs-on: ubuntu-latest
@@ -92,7 +91,7 @@ jobs:
           if-no-files-found: error
 
   build_ios:
-    name: Build iOS IPA
+    name: Build iOS App
     runs-on: macos-latest
     needs: test
     steps:
@@ -113,12 +112,9 @@ jobs:
       - name: Build unsigned IPA
         run: flutter build ipa --no-codesign
 
-      - name: List build artifacts
-        run: ls -R build/ios
-
-      - name: Upload IPA artifact
+      - name: Upload iOS Archive artifact 
         uses: actions/upload-artifact@v4
         with:
-          name: app-unsigned-ipa
-          path: build/ios/ipa/*.ipa
+          name: app-xcarchive
+          path: build/ios/archive/Runner.xcarchive
           if-no-files-found: error
