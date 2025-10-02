@@ -117,5 +117,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-unsigned-ipa
-          path: build/ios/ipa/
+          path: build/ios/ipa/*.ipa
           if-no-files-found: error
