@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:movie_discovery_app/core/error/exceptions.dart';
 import 'package:movie_discovery_app/features/favorites/data/models/favorite_movie_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:movie_discovery_app/core/database/app_database.dart';
+import 'package:drift/drift.dart' as drift;
 
 abstract class FavoritesLocalDataSource {
   Future<List<FavoriteMovieModel>> getFavoriteMovies();
@@ -11,22 +12,28 @@ abstract class FavoritesLocalDataSource {
 }
 
 class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
-  static const String _favoritesKey = 'favorite_movies';
-  final SharedPreferences sharedPreferences;
+  final AppDatabase db;
 
-  FavoritesLocalDataSourceImpl({required this.sharedPreferences});
+  FavoritesLocalDataSourceImpl({required this.db});
 
   @override
   Future<List<FavoriteMovieModel>> getFavoriteMovies() async {
     try {
-      final jsonString = sharedPreferences.getString(_favoritesKey);
-      if (jsonString != null) {
-        final List<dynamic> jsonList = json.decode(jsonString);
-        return jsonList
-            .map((json) => FavoriteMovieModel.fromJson(json))
-            .toList();
-      }
-      return [];
+      final rows = await db.getAllFavorites();
+      return rows.map((r) {
+        final genreIds = (jsonDecode(r.genreIdsJson) as List).map((e) => e as int).toList();
+        return FavoriteMovieModel(
+          id: r.id,
+          title: r.title,
+          overview: r.overview,
+          posterPath: r.posterPath,
+          backdropPath: r.backdropPath,
+          voteAverage: r.voteAverage,
+          releaseDate: r.releaseDate,
+          genreIds: genreIds,
+          dateAdded: r.dateAdded,
+        );
+      }).toList(growable: false);
     } catch (e) {
       throw CacheException('Failed to get favorite movies: $e');
     }
@@ -35,16 +42,19 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<bool> addToFavorites(FavoriteMovieModel movie) async {
     try {
-      final favorites = await getFavoriteMovies();
-
-      // Check if movie is already in favorites
-      if (favorites.any((fav) => fav.id == movie.id)) {
-        return false; // Already exists
-      }
-
-      favorites.add(movie);
-      final jsonString = json.encode(favorites.map((fav) => fav.toJson()).toList());
-      return await sharedPreferences.setString(_favoritesKey, jsonString);
+      final entry = FavoritesCompanion(
+        id: drift.Value(movie.id),
+        title: drift.Value(movie.title),
+        overview: drift.Value(movie.overview),
+        posterPath: drift.Value(movie.posterPath),
+        backdropPath: drift.Value(movie.backdropPath),
+        voteAverage: drift.Value(movie.voteAverage),
+        releaseDate: drift.Value(movie.releaseDate),
+        genreIdsJson: drift.Value(jsonEncode(movie.genreIds)),
+        dateAdded: drift.Value(movie.dateAdded),
+      );
+      await db.upsertFavorite(entry);
+      return true;
     } catch (e) {
       throw CacheException('Failed to add movie to favorites: $e');
     }
@@ -53,17 +63,8 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<bool> removeFromFavorites(int movieId) async {
     try {
-      final favorites = await getFavoriteMovies();
-      final initialLength = favorites.length;
-
-      favorites.removeWhere((fav) => fav.id == movieId);
-
-      if (favorites.length == initialLength) {
-        return false; // Movie wasn't in favorites
-      }
-
-      final jsonString = json.encode(favorites.map((fav) => fav.toJson()).toList());
-      return await sharedPreferences.setString(_favoritesKey, jsonString);
+      final removed = await db.removeFavorite(movieId);
+      return removed > 0;
     } catch (e) {
       throw CacheException('Failed to remove movie from favorites: $e');
     }
@@ -72,8 +73,7 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<bool> isFavorite(int movieId) async {
     try {
-      final favorites = await getFavoriteMovies();
-      return favorites.any((fav) => fav.id == movieId);
+      return await db.isFavoriteId(movieId);
     } catch (e) {
       throw CacheException('Failed to check if movie is favorite: $e');
     }

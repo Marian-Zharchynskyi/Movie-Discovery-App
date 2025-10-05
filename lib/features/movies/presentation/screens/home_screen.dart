@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_discovery_app/features/favorites/presentation/widgets/favorite_button.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
 
@@ -86,14 +87,41 @@ class MovieCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: movie.posterPath != null
-                ? Image.network(
-                    movie.fullPosterPath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                  )
-                : const Center(child: Icon(Icons.movie)),
+          // Movie poster with favorite button
+          SizedBox(
+            height: 200, // Fixed height for the image container
+            child: Stack(
+              fit: StackFit.expand, // Make stack fill the SizedBox
+              children: [
+                // Movie poster
+                movie.posterPath != null
+                    ? Image.network(
+                        movie.fullPosterPath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Center(
+                          child: Icon(Icons.error, size: 50),
+                        ),
+                      )
+                    : const Center(child: Icon(Icons.movie, size: 50)),
+                // Favorite button
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: FavoriteButton(
+                      movieId: movie.id,
+                      size: 36,
+                      activeColor: Colors.red,
+                      inactiveColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

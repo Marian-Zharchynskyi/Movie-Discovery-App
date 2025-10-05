@@ -93,16 +93,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'No favorites yet',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                    ),
+                    style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Tap the heart icon on any movie to add it to your favorites',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(
-color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text(
+                      'Tap the heart icon on any movie to add it to your favorites',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall,
                     ),
                   ),
                 ],
@@ -152,6 +151,4 @@ color: theme.colorScheme.onSurface.withOpacity(0.7),
       }
     }
   }
-
-
 }
