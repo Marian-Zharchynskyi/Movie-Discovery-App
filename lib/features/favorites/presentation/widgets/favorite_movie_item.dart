@@ -5,6 +5,7 @@ import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity
 import 'package:movie_discovery_app/features/movies/presentation/screens/movie_details_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
+import 'package:movie_discovery_app/shared/widgets/shimmers/image_shimmer.dart';
 
 class FavoriteMovieItem extends ConsumerWidget {
   final FavoriteMovieEntity movie;
@@ -73,24 +74,25 @@ class FavoriteMovieItem extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Movie poster
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CachedNetworkImage(
-                    imageUrl: movie.fullPosterPath,
-                    width: 80,
-                    height: 120,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
+                Hero(
+                  tag: 'moviePoster_${movie.id}',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: movie.fullPosterPath,
                       width: 80,
                       height: 120,
-                      color: Colors.grey[300],
-                      child: const Center(child: CircularProgressIndicator()),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      width: 80,
-                      height: 120,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.error_outline, color: Colors.grey),
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const ImageShimmer(
+                        width: 80,
+                        height: 120,
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 80,
+                        height: 120,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.error_outline, color: Colors.grey),
+                      ),
                     ),
                   ),
                 ),

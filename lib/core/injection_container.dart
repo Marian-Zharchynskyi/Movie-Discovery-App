@@ -18,6 +18,7 @@ import 'package:movie_discovery_app/features/movies/data/repositories/movie_repo
 import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_top_rated_movies.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_details.dart';
 
 final sl = GetIt.instance;
 
@@ -43,6 +44,7 @@ Future<void> _initExternalDependencies() async {
   // Register use cases
   sl.registerFactory(() => GetPopularMovies(sl()));
   sl.registerFactory(() => GetTopRatedMovies(sl()));
+  sl.registerFactory(() => GetMovieDetails(sl()));
   sl.registerFactory(() => GetFavoriteMovies(sl()));
   sl.registerFactory(() => AddToFavorites(sl()));
   sl.registerFactory(() => RemoveFromFavorites(sl()));
