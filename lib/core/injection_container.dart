@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:movie_discovery_app/core/network/dio_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:movie_discovery_app/core/database/app_database.dart';
 
 import 'package:movie_discovery_app/features/favorites/data/datasources/local/favorites_local_data_source.dart';
 import 'package:movie_discovery_app/features/favorites/data/repositories/favorites_repository_impl.dart';
@@ -12,6 +13,7 @@ import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favor
 import 'package:movie_discovery_app/features/favorites/domain/usecases/is_favorite.dart';
 import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_from_favorites.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
+import 'package:movie_discovery_app/features/movies/data/datasources/local/movie_local_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/repositories/movie_repository_impl.dart';
 import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
@@ -48,7 +50,7 @@ Future<void> _initExternalDependencies() async {
   
   // Register repositories
   sl.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(remoteDataSource: sl()),
+    () => MovieRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
   sl.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepositoryImpl(localDataSource: sl()),
@@ -58,8 +60,11 @@ Future<void> _initExternalDependencies() async {
   sl.registerLazySingleton<MovieRemoteDataSource>(
     () => MovieRemoteDataSourceImpl(client: sl()),
   );
+  sl.registerLazySingleton<MovieLocalDataSource>(
+    () => MovieLocalDataSourceImpl(db: sl()),
+  );
   sl.registerLazySingleton<FavoritesLocalDataSource>(
-    () => FavoritesLocalDataSourceImpl(sharedPreferences: sl()),
+    () => FavoritesLocalDataSourceImpl(db: sl()),
   );
   
   // Register Dio with interceptors
@@ -74,5 +79,6 @@ Future<void> _initExternalDependencies() async {
     );
   });
 
-  // Database and storage initialization can be added here later
+  // Drift database
+  sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
 }
