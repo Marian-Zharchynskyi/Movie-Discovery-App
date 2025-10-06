@@ -65,6 +65,9 @@ dependencies:
   # Image Caching
   cached_network_image: ^3.3.1
   
+  # Loading animations
+  shimmer: ^3.0.0
+  
   # Environment Variables
   flutter_dotenv: ^5.1.0
   

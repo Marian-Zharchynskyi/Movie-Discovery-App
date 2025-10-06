@@ -2,9 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/core/injection_container.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_details.dart';
 
 final getPopularMoviesProvider = Provider<GetPopularMovies>((ref) {
   return sl<GetPopularMovies>();
+});
+
+final getMovieDetailsProvider = Provider<GetMovieDetails>((ref) {
+  return sl<GetMovieDetails>();
 });
 
 class MovieState {
@@ -32,6 +37,16 @@ class MovieState {
     );
   }
 }
+
+/// Fetch movie details by ID. Exposes AsyncValue state (loading/error/data).
+final movieDetailsProvider = FutureProvider.family<MovieEntity, int>((ref, movieId) async {
+  final getMovieDetails = ref.watch(getMovieDetailsProvider);
+  final result = await getMovieDetails(movieId);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (movie) => movie,
+  );
+});
 
 final movieProvider = StateNotifierProvider<MovieNotifier, MovieState>((ref) {
   final getPopularMovies = ref.watch(getPopularMoviesProvider);
