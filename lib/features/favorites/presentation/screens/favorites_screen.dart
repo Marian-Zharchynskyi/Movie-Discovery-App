@@ -14,11 +14,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    _loadFavorites();
+    // Use addPostFrameCallback to safely access ref after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadFavorites();
+    });
   }
 
   Future<void> _loadFavorites() async {
-    await ref.read(favoritesProvider.notifier).loadFavoriteMovies();
+    if (mounted) {
+      await ref.read(favoritesProvider.notifier).loadFavoriteMovies();
+    }
   }
 
   Future<void> _onRefresh() async {
@@ -88,7 +93,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   Icon(
                     Icons.favorite_border,
                     size: 64,
-                    color: theme.hintColor.withOpacity(0.5),
+                    color: theme.hintColor.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -102,7 +107,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                     'Tap the heart icon on any movie to add it to your favorites',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(
-color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

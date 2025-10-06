@@ -23,6 +23,12 @@ final isFavoriteProvider = Provider<IsFavorite>((ref) {
   return sl<IsFavorite>();
 });
 
+// Helper class for nullable values in copyWith
+class _Wrapped<T> {
+  final T value;
+  const _Wrapped(this.value);
+}
+
 // State
 class FavoritesState {
   final List<FavoriteMovieEntity> favoriteMovies;
@@ -39,13 +45,17 @@ class FavoritesState {
 
   FavoritesState copyWith({
     List<FavoriteMovieEntity>? favoriteMovies,
-    bool? isLoading,
-    String? error,
+    Object? isLoading = const _Wrapped(null),
+    Object? error = const _Wrapped(null),
   }) {
     return FavoritesState(
       favoriteMovies: favoriteMovies ?? this.favoriteMovies,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
+      isLoading: isLoading is _Wrapped
+          ? (isLoading.value as bool? ?? this.isLoading)
+          : isLoading as bool,
+      error: error is _Wrapped
+          ? (error.value as String? ?? this.error)
+          : error as String?,
     );
   }
 }
@@ -72,22 +82,32 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
   Future<void> loadFavoriteMovies() async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _getFavoriteMovies();
+    try {
+      final result = await _getFavoriteMovies();
 
-    result.fold(
-      (failure) => state = state.copyWith(
+      result.fold(
+        (failure) {
+          state = state.copyWith(
+            isLoading: false,
+            error: failure.message,
+          );
+        },
+        (movies) {
+          state = state.copyWith(
+            favoriteMovies: movies,
+            isLoading: false,
+            error: null,
+          );
+        },
+      );
+    } catch (e) {
+      state = state.copyWith(
         isLoading: false,
-        error: failure.message,
-      ),
-      (movies) => state = state.copyWith(
-        favoriteMovies: movies,
-        isLoading: false,
-        error: null,
-      ),
-    );
+        error: 'Failed to load favorites: $e',
+      );
+    }
   }
 
-  // Add a movie to favorites
   Future<bool> addMovieToFavorites(FavoriteMovieEntity movie) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
@@ -102,7 +122,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
           return false;
         },
         (success) {
-                  // Add to local state if not already present
           if (!state.favoriteMovies.any((m) => m.id == movie.id)) {
             state = state.copyWith(
               favoriteMovies: [...state.favoriteMovies, movie],
@@ -123,7 +142,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     }
   }
 
-  // Remove a movie from favorites
   Future<bool> removeFromFavorites(int movieId) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
@@ -156,7 +174,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     }
   }
 
-  // Check if a movie is in favorites
   Future<bool> isFavorite(int movieId) async {
     try {
       final result = await _isFavorite(movieId);
@@ -173,7 +190,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     }
   }
 
-  // Get a favorite movie by ID
   FavoriteMovieEntity? getFavoriteMovie(int movieId) {
     try {
       return state.favoriteMovies.firstWhere(
@@ -184,7 +200,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     }
   }
 
-  // Toggle favorite status
   Future<bool> toggleFavorite(FavoriteMovieEntity movie) async {
     final isCurrentlyFavorite = state.favoriteMovies.any((m) => m.id == movie.id);
     
@@ -196,7 +211,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
   }
 }
 
-// Provider
 final favoritesProvider = StateNotifierProvider<FavoritesNotifier, FavoritesState>((ref) {
   return FavoritesNotifier(
     getFavoriteMovies: ref.watch(getFavoriteMoviesProvider),

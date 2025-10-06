@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_discovery_app/features/favorites/domain/entities/favorite_movie_entity.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
+import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
 
 class FavoriteButton extends ConsumerStatefulWidget {
-  final int movieId;
+  final MovieEntity movie;
   final double size;
   final Color? color;
   final Color? activeColor;
@@ -11,7 +13,7 @@ class FavoriteButton extends ConsumerStatefulWidget {
 
   const FavoriteButton({
     super.key,
-    required this.movieId,
+    required this.movie,
     this.size = 32.0,
     this.color,
     this.activeColor,
@@ -29,7 +31,9 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
   @override
   void initState() {
     super.initState();
-    _checkFavoriteStatus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFavoriteStatus();
+    });
   }
 
   Future<void> _checkFavoriteStatus() async {
@@ -38,7 +42,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
       try {
         final isFavorite = await ref
             .read(favoritesProvider.notifier)
-            .isFavorite(widget.movieId);
+            .isFavorite(widget.movie.id);
         if (mounted) {
           setState(() {
             _isFavorite = isFavorite;
@@ -60,17 +64,42 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
     setState(() => _isLoading = true);
     try {
       if (_isFavorite) {
-        await ref
+        final success = await ref
             .read(favoritesProvider.notifier)
-            .removeFromFavorites(widget.movieId);
+            .removeFromFavorites(widget.movie.id);
         if (mounted) {
-          setState(() => _isFavorite = false);
-          _showSnackBar('Removed from favorites');
+          if (success) {
+            setState(() => _isFavorite = false);
+            _showSnackBar('Removed from favorites');
+          } else {
+            _showErrorSnackBar('Failed to remove from favorites');
+          }
         }
       } else {
-        // Assuming the parent has the movie details to add to favorites
-        // This would need to be passed in if needed
-        _showSnackBar('Added to favorites');
+        // Convert MovieEntity to FavoriteMovieEntity
+        final favoriteMovie = FavoriteMovieEntity(
+          id: widget.movie.id,
+          title: widget.movie.title,
+          overview: widget.movie.overview,
+          posterPath: widget.movie.posterPath,
+          backdropPath: widget.movie.backdropPath,
+          voteAverage: widget.movie.voteAverage,
+          releaseDate: widget.movie.releaseDate,
+          genreIds: widget.movie.genreIds,
+          dateAdded: DateTime.now(),
+        );
+        
+        final success = await ref
+            .read(favoritesProvider.notifier)
+            .addMovieToFavorites(favoriteMovie);
+        if (mounted) {
+          if (success) {
+            setState(() => _isFavorite = true);
+            _showSnackBar('Added to favorites');
+          } else {
+            _showErrorSnackBar('Failed to add to favorites');
+          }
+        }
       }
     } catch (e) {
       if (mounted) {

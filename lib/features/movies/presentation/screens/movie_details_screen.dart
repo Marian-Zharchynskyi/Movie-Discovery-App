@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:movie_discovery_app/features/movies/data/models/genre_model.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
 
 class MovieDetailsScreen extends StatelessWidget {
   final MovieEntity movie;
 
   const MovieDetailsScreen({
-    Key? key,
+    super.key,
     required this.movie,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +80,14 @@ class MovieDetailsScreen extends StatelessWidget {
                           runSpacing: 4.0,
                           children: movie.genreIds.take(3).map((genreId) {
                             return Chip(
-                              label: Text('Genre $genreId'),
-                              padding: EdgeInsets.zero,
+                              label: Text(GenreModel.getGenreName(genreId)),
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                fontSize: 12,
+                              ),
                             );
                           }).toList(),
                         ),
