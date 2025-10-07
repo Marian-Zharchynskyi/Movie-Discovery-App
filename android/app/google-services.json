@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "406930289005",
+    "project_id": "movie-discovery-app-37e3a",
+    "storage_bucket": "movie-discovery-app-37e3a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406930289005:android:246db4af1dceee588e6a64",
+        "android_client_info": {
+          "package_name": "com.example.movie_discovery_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "406930289005-lbt4ioj30lf4rku280sl9tq8knvi9ri7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA72PMkklZ-QBvr9PmhKYcH2Pt4r3p40Tg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "406930289005-lbt4ioj30lf4rku280sl9tq8knvi9ri7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

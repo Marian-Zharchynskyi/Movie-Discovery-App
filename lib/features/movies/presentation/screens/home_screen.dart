@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-  import 'package:flutter_riverpod/flutter_riverpod.dart';
-  import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
-  import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
-  import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
+import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
+import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,20 @@ class HomeScreen extends ConsumerStatefulWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Popular Movies'),
+        actions: [
+          IconButton(
+            tooltip: 'Sign out',
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await ref.read(authProvider.notifier).signOutUser();
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Signed out')),
+              );
+              // GoRouter redirect will handle navigation to /login
+            },
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {

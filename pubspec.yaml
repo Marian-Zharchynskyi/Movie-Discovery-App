@@ -77,6 +77,10 @@ dependencies:
   dartz: ^0.10.1
 
   intl: ^0.18.0
+  cloud_firestore: ^6.0.2
+  
+  # Routing
+  go_router: ^14.0.0
 
 dev_dependencies:
   flutter_test:

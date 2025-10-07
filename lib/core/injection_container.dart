@@ -1,9 +1,20 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:movie_discovery_app/core/network/dio_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movie_discovery_app/core/database/app_database.dart';
+
+import 'package:movie_discovery_app/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:movie_discovery_app/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:movie_discovery_app/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:movie_discovery_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/get_current_user.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/sign_in.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/sign_out.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/sign_up.dart';
 
 import 'package:movie_discovery_app/features/favorites/data/datasources/local/favorites_local_data_source.dart';
 import 'package:movie_discovery_app/features/favorites/data/repositories/favorites_repository_impl.dart';
@@ -27,7 +38,7 @@ Future<void> init() async {
   await _initExternalDependencies();
   
   //! Features - will be added in next steps
-  // await _initAuthFeature();
+  await _initAuthFeature();
   // await _initMoviesFeature();
   // await _initFavoritesFeature();
   // await _initProfileFeature();
@@ -40,6 +51,12 @@ Future<void> _initExternalDependencies() async {
   // Register SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  
+  // FirebaseAuth
+  sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  
+  // Secure Storage
+  sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
   
   // Register use cases
   sl.registerFactory(() => GetPopularMovies(sl()));
@@ -83,4 +100,25 @@ Future<void> _initExternalDependencies() async {
 
   // Drift database
   sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
+}
+
+Future<void> _initAuthFeature() async {
+  // Data sources
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(firebaseAuth: sl()),
+  );
+  sl.registerLazySingleton<AuthLocalDataSource>(
+    () => AuthLocalDataSourceImpl(secureStorage: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerFactory(() => SignIn(sl()));
+  sl.registerFactory(() => SignUp(sl()));
+  sl.registerFactory(() => SignOut(sl()));
+  sl.registerFactory(() => GetCurrentUser(sl()));
 }
