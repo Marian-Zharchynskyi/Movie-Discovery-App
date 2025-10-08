@@ -117,6 +117,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: true,
+      addSemanticIndexes: false,
       itemCount: state.movies.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= state.movies.length) {
@@ -128,7 +131,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         }
         final movie = state.movies[index];
-        return MovieCard(movie: movie);
+        return MovieCard(key: ValueKey(movie.id), movie: movie);
       },
     );
   }

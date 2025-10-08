@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/core/injection_container.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_details.dart';
@@ -89,7 +90,7 @@ class MovieNotifier extends StateNotifier<MovieState> {
         isLoading: false,
         movies: movies,
         currentPage: 1,
-        hasMorePages: movies.length >= 20, // TMDB returns 20 items per page
+        hasMorePages: movies.length >= int.parse(dotenv.env['PAGE_SIZE']!),
       ),
     );
   }
@@ -114,7 +115,7 @@ class MovieNotifier extends StateNotifier<MovieState> {
           isLoadingMore: false,
           movies: updatedMovies,
           currentPage: nextPage,
-          hasMorePages: newMovies.length >= 20,
+          hasMorePages: newMovies.length >= int.parse(dotenv.env['PAGE_SIZE']!),
         );
       },
     );
