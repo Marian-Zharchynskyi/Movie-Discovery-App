@@ -6,6 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:movie_discovery_app/core/network/dio_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movie_discovery_app/core/database/app_database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:movie_discovery_app/core/preferences/user_preferences.dart';
 
 import 'package:movie_discovery_app/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:movie_discovery_app/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -51,6 +53,11 @@ Future<void> _initExternalDependencies() async {
   // Register SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+
+  // Hive for user preferences
+  await Hive.initFlutter();
+  final userPrefsBox = await Hive.openBox(UserPreferences.boxName);
+  sl.registerLazySingleton<UserPreferences>(() => UserPreferences(userPrefsBox));
   
   // FirebaseAuth
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);

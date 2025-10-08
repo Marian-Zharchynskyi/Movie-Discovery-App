@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/core/injection_container.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-// Keys for persistence
-const _kThemeModeKey = 'settings.theme_mode'; // values: light|dark|system
-const _kLocaleKey = 'settings.locale'; // e.g., en|uk|null
+import 'package:movie_discovery_app/core/preferences/user_preferences.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
@@ -37,23 +33,23 @@ class SettingsState {
   }
 }
 
-final sharedPrefsProvider = Provider<SharedPreferences>((ref) => sl<SharedPreferences>());
+final userPrefsProvider = Provider<UserPreferences>((ref) => sl<UserPreferences>());
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
-  final prefs = ref.watch(sharedPrefsProvider);
+  final prefs = ref.watch(userPrefsProvider);
   return SettingsNotifier(prefs)..loadSettings();
 });
 
 class SettingsNotifier extends StateNotifier<SettingsState> {
-  final SharedPreferences _prefs;
+  final UserPreferences _prefs;
 
   SettingsNotifier(this._prefs) : super(const SettingsState.initial());
 
   Future<void> loadSettings() async {
     try {
       state = state.copyWith(isLoading: true, error: null);
-      final themeString = _prefs.getString(_kThemeModeKey);
-      final localeCode = _prefs.getString(_kLocaleKey);
+      final themeString = _prefs.getThemeModeString();
+      final localeCode = _prefs.getLocaleCode();
 
       state = state.copyWith(
         themeMode: _parseTheme(themeString) ?? ThemeMode.system,
@@ -69,7 +65,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> setThemeMode(ThemeMode mode) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
-      await _prefs.setString(_kThemeModeKey, _themeToString(mode));
+      await _prefs.setThemeModeString(_themeToString(mode));
       state = state.copyWith(themeMode: mode, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Failed to save theme: $e');
@@ -84,11 +80,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> setLocale(Locale? locale) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
-      if (locale == null) {
-        await _prefs.remove(_kLocaleKey);
-      } else {
-        await _prefs.setString(_kLocaleKey, locale.languageCode);
-      }
+      await _prefs.setLocaleCode(locale?.languageCode);
       state = state.copyWith(locale: locale, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Failed to save locale: $e');

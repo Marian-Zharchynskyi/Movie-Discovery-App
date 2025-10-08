@@ -8,7 +8,8 @@ import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/screens/home_screen.dart';
 import 'package:movie_discovery_app/features/settings/presentation/providers/settings_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:movie_discovery_app/core/preferences/user_preferences.dart';
 import 'package:movie_discovery_app/main.dart';
 
 // Mock GetPopularMovies
@@ -27,14 +28,15 @@ void main() {
         .thenAnswer((_) async => const Right([]));
 
     // Build our app with provider overrides
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
+    await Hive.initFlutter();
+    final box = await Hive.openBox(UserPreferences.boxName);
+    final userPrefs = UserPreferences(box);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           getPopularMoviesProvider.overrideWithValue(mockGetPopularMovies),
-          // Provide in-memory SharedPreferences to settings provider stack
-          sharedPrefsProvider.overrideWithValue(prefs),
+          // Provide in-memory Hive-backed preferences to settings provider stack
+          userPrefsProvider.overrideWithValue(userPrefs),
           // Force router to start at /home without auth redirects
           goRouterProvider.overrideWith((ref) => GoRouter(
                 initialLocation: '/home',
