@@ -12,11 +12,33 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-  class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() => ref.read(movieProvider.notifier).fetchPopularMovies());
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      ref.read(movieProvider.notifier).loadMoreMovies();
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
   }
 
     @override
@@ -36,7 +58,6 @@ class HomeScreen extends ConsumerStatefulWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Signed out')),
               );
-              // GoRouter redirect will handle navigation to /login
             },
           ),
         ],
@@ -88,6 +109,7 @@ class HomeScreen extends ConsumerStatefulWidget {
     }
 
     return GridView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.all(8),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
@@ -95,8 +117,16 @@ class HomeScreen extends ConsumerStatefulWidget {
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
-      itemCount: state.movies.length,
+      itemCount: state.movies.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index >= state.movies.length) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
         final movie = state.movies[index];
         return MovieCard(movie: movie);
       },

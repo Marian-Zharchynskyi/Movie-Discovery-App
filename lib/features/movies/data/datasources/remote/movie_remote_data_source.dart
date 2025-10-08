@@ -3,10 +3,10 @@ import 'package:movie_discovery_app/core/error/exceptions.dart';
 import 'package:movie_discovery_app/features/movies/data/models/movie_model.dart';
 
 abstract class MovieRemoteDataSource {
-  Future<List<MovieModel>> getPopularMovies();
-  Future<List<MovieModel>> getTopRatedMovies();
+  Future<List<MovieModel>> getPopularMovies({int page = 1});
+  Future<List<MovieModel>> getTopRatedMovies({int page = 1});
   Future<MovieModel> getMovieDetails(int movieId);
-  Future<List<MovieModel>> searchMovies(String query);
+  Future<List<MovieModel>> searchMovies(String query, {int page = 1});
 }
 
 class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
@@ -15,9 +15,12 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
   MovieRemoteDataSourceImpl({required this.client});
 
   @override
-  Future<List<MovieModel>> getPopularMovies() async {
+  Future<List<MovieModel>> getPopularMovies({int page = 1}) async {
     try {
-      final response = await client.get('/movie/popular');
+      final response = await client.get(
+        '/movie/popular',
+        queryParameters: {'page': page},
+      );
       if (response.statusCode == 200) {
         return (response.data['results'] as List)
             .map((movie) => MovieModel.fromJson(movie))
@@ -45,9 +48,12 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
   }
 
   @override
-  Future<List<MovieModel>> getTopRatedMovies() async {
+  Future<List<MovieModel>> getTopRatedMovies({int page = 1}) async {
     try {
-      final response = await client.get('/movie/top_rated');
+      final response = await client.get(
+        '/movie/top_rated',
+        queryParameters: {'page': page},
+      );
       if (response.statusCode == 200) {
         return (response.data['results'] as List)
             .map((movie) => MovieModel.fromJson(movie))
@@ -61,12 +67,13 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
   }
 
   @override
-  Future<List<MovieModel>> searchMovies(String query) async {
+  Future<List<MovieModel>> searchMovies(String query, {int page = 1}) async {
     try {
       final response = await client.get(
         '/search/movie',
         queryParameters: {
           'query': query,
+          'page': page,
         },
       );
       if (response.statusCode == 200) {

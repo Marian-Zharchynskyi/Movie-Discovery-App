@@ -13,18 +13,22 @@ class MovieRepositoryImpl implements MovieRepository {
   MovieRepositoryImpl({required this.remoteDataSource, required this.localDataSource});
 
   @override
-  Future<Either<Failure, List<MovieEntity>>> getPopularMovies() async {
+  Future<Either<Failure, List<MovieEntity>>> getPopularMovies({int page = 1}) async {
     try {
-      final movies = await remoteDataSource.getPopularMovies();
-      // cache
-      await localDataSource.cachePopularMovies(movies);
+      final movies = await remoteDataSource.getPopularMovies(page: page);
+      // cache only first page
+      if (page == 1) {
+        await localDataSource.cachePopularMovies(movies);
+      }
       return Right(movies);
     } on ServerException catch (e) {
-      // fallback to cache
-      try {
-        final cached = await localDataSource.getCachedPopularMovies();
-        if (cached.isNotEmpty) return Right(cached);
-      } catch (_) {}
+      // fallback to cache only for first page
+      if (page == 1) {
+        try {
+          final cached = await localDataSource.getCachedPopularMovies();
+          if (cached.isNotEmpty) return Right(cached);
+        } catch (_) {}
+      }
       return Left(ServerFailure(e.message));
     }
   }
@@ -45,30 +49,39 @@ class MovieRepositoryImpl implements MovieRepository {
   }
 
   @override
-  Future<Either<Failure, List<MovieEntity>>> getTopRatedMovies() async {
+  Future<Either<Failure, List<MovieEntity>>> getTopRatedMovies({int page = 1}) async {
     try {
-      final movies = await remoteDataSource.getTopRatedMovies();
-      await localDataSource.cacheTopRatedMovies(movies);
+      final movies = await remoteDataSource.getTopRatedMovies(page: page);
+      // cache only first page
+      if (page == 1) {
+        await localDataSource.cacheTopRatedMovies(movies);
+      }
       return Right(movies);
     } on ServerException catch (e) {
-      try {
-        final cached = await localDataSource.getCachedTopRatedMovies();
-        if (cached.isNotEmpty) return Right(cached);
-      } catch (_) {}
+      // fallback to cache only for first page
+      if (page == 1) {
+        try {
+          final cached = await localDataSource.getCachedTopRatedMovies();
+          if (cached.isNotEmpty) return Right(cached);
+        } catch (_) {}
+      }
       return Left(ServerFailure(e.message));
     }
   }
 
   @override
-  Future<Either<Failure, List<MovieEntity>>> searchMovies(String query) async {
+  Future<Either<Failure, List<MovieEntity>>> searchMovies(String query, {int page = 1}) async {
     try {
-      final movies = await remoteDataSource.searchMovies(query);
+      final movies = await remoteDataSource.searchMovies(query, page: page);
       return Right(movies);
     } on ServerException catch (e) {
-      try {
-        final cached = await localDataSource.searchCachedMovies(query);
-        if (cached.isNotEmpty) return Right(cached);
-      } catch (_) {}
+      // fallback to cache only for first page
+      if (page == 1) {
+        try {
+          final cached = await localDataSource.searchCachedMovies(query);
+          if (cached.isNotEmpty) return Right(cached);
+        } catch (_) {}
+      }
       return Left(ServerFailure(e.message));
     }
   }
