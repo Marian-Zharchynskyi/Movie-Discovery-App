@@ -31,7 +31,6 @@ class MovieCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Poster + Favorite button
             SizedBox(
               height: 220,
               child: Stack(
@@ -71,7 +70,6 @@ class MovieCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Title + rating + year
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
