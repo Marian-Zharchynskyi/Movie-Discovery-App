@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/injection_container.dart' as di;
 import 'core/router/app_router.dart';
 import 'firebase_options.dart';
+import 'features/settings/presentation/providers/settings_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +12,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
   await di.init();
   
   runApp(
@@ -23,7 +23,6 @@ Future<void> main() async {
 
 class MovieDiscoveryApp extends StatefulWidget {
   const MovieDiscoveryApp({super.key});
-
   @override
   State<MovieDiscoveryApp> createState() => _MovieDiscoveryAppState();
 }
@@ -34,13 +33,23 @@ class _MovieDiscoveryAppState extends State<MovieDiscoveryApp> {
     return Consumer(
       builder: (context, ref, _) {
         final goRouter = ref.watch(goRouterProvider);
+        final settings = ref.watch(settingsProvider);
         return MaterialApp.router(
           title: 'Movie Discovery',
           debugShowCheckedModeBanner: false,
+          locale: settings.locale,
+          themeMode: settings.themeMode,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.blue,
               brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.blue,
+              brightness: Brightness.dark,
             ),
             useMaterial3: true,
           ),
