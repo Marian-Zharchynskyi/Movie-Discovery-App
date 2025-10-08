@@ -1,11 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/injection_container.dart' as di;
-import 'features/favorites/presentation/screens/favorites_screen.dart';
-import 'features/movies/presentation/screens/home_screen.dart';
+import 'core/router/app_router.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
   await di.init();
   
@@ -24,49 +29,24 @@ class MovieDiscoveryApp extends StatefulWidget {
 }
 
 class _MovieDiscoveryAppState extends State<MovieDiscoveryApp> {
-  int _selectedIndex = 0;
-
-  static final List<Widget> _screens = [
-    const HomeScreen(),
-    const FavoritesScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Movie Discovery',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        body: _screens.elementAt(_selectedIndex),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+    return Consumer(
+      builder: (context, ref, _) {
+        final goRouter = ref.watch(goRouterProvider);
+        return MaterialApp.router(
+          title: 'Movie Discovery',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.blue,
+              brightness: Brightness.light,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              label: 'Favorites',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          onTap: _onItemTapped,
-        ),
-      ),
+            useMaterial3: true,
+          ),
+          routerConfig: goRouter,
+        );
+      },
     );
   }
 }
