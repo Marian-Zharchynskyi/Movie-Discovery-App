@@ -1,55 +1,71 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:movie_discovery_app/core/router/app_router.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/screens/home_screen.dart';
-import 'package:movie_discovery_app/features/settings/presentation/providers/settings_provider.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:movie_discovery_app/core/preferences/user_preferences.dart';
-import 'package:movie_discovery_app/main.dart';
+import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:movie_discovery_app/features/auth/domain/entities/user_entity.dart';
+import 'package:movie_discovery_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/get_current_user.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/sign_in.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/sign_out.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/sign_up.dart';
 
-// Mock GetPopularMovies
+// Mocks
 class MockGetPopularMovies extends Mock implements GetPopularMovies {}
+class MockSignIn extends Mock implements SignIn {}
+class MockSignUp extends Mock implements SignUp {}
+class MockSignOut extends Mock implements SignOut {}
+class MockGetCurrentUser extends Mock implements GetCurrentUser {}
+class MockAuthRepository extends Mock implements AuthRepository {
+  @override
+  Stream<UserEntity?> get authStateChanges => const Stream.empty();
+}
 
 void main() {
   late MockGetPopularMovies mockGetPopularMovies;
+  late MockAuthRepository mockAuthRepository;
+  late MockSignIn mockSignIn;
+  late MockSignUp mockSignUp;
+  late MockSignOut mockSignOut;
+  late MockGetCurrentUser mockGetCurrentUser;
 
   setUp(() {
     mockGetPopularMovies = MockGetPopularMovies();
+    mockAuthRepository = MockAuthRepository();
+    mockSignIn = MockSignIn();
+    mockSignUp = MockSignUp();
+    mockSignOut = MockSignOut();
+    mockGetCurrentUser = MockGetCurrentUser();
   });
 
-  testWidgets('App should show HomeScreen on startup', (WidgetTester tester) async {
-    // Setup mock response
-    when(() => mockGetPopularMovies())
+  testWidgets('HomeScreen should display correctly', (WidgetTester tester) async {
+    // Setup mocks
+    when(() => mockGetPopularMovies(page: any(named: 'page')))
         .thenAnswer((_) async => const Right([]));
 
-    // Build our app with provider overrides
-    await Hive.initFlutter();
-    final box = await Hive.openBox(UserPreferences.boxName);
-    final userPrefs = UserPreferences(box);
+    // Build HomeScreen directly with provider overrides
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           getPopularMoviesProvider.overrideWithValue(mockGetPopularMovies),
-          // Provide in-memory Hive-backed preferences to settings provider stack
-          userPrefsProvider.overrideWithValue(userPrefs),
-          // Force router to start at /home without auth redirects
-          goRouterProvider.overrideWith((ref) => GoRouter(
-                initialLocation: '/home',
-                routes: [
-                  GoRoute(
-                    path: '/home',
-                    name: 'home',
-                    builder: (context, state) => const HomeScreen(),
-                  ),
-                ],
-              )),
+          // Mock auth provider to prevent Firebase initialization
+          authProvider.overrideWith((ref) {
+            return AuthNotifier(
+              signIn: mockSignIn,
+              signUp: mockSignUp,
+              signOut: mockSignOut,
+              getCurrentUser: mockGetCurrentUser,
+              authRepository: mockAuthRepository,
+            );
+          }),
         ],
-        child: const MovieDiscoveryApp(),
+        child: const MaterialApp(
+          home: HomeScreen(),
+        ),
       ),
     );
     
