@@ -1,5 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class MovieEntity {
   final int id;
   final String title;
@@ -21,17 +19,11 @@ class MovieEntity {
     required this.genreIds,
   });
 
-  String get fullPosterPath {
-    if (posterPath == null) return '';
-    final base = dotenv.env['TMDB_IMAGE_BASE_URL']!;
-    final size = dotenv.env['TMDB_POSTER_SIZE']!;
-    return '$base$size$posterPath';
-  }
+  String get fullPosterPath => posterPath != null
+      ? 'https://image.tmdb.org/t/p/w500$posterPath'
+      : '';
 
-  String get fullBackdropPath {
-    if (backdropPath == null) return '';
-    final base = dotenv.env['TMDB_IMAGE_BASE_URL']!;
-    final size = dotenv.env['TMDB_BACKDROP_SIZE']!;
-    return '$base$size$backdropPath';
-  }
+  String get fullBackdropPath => backdropPath != null
+      ? 'https://image.tmdb.org/t/p/w1280$backdropPath'
+      : '';
 }

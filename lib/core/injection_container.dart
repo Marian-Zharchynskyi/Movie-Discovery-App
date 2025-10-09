@@ -103,24 +103,13 @@ Future<void> _initExternalDependencies() async {
   
   // Register Dio with interceptors
   sl.registerLazySingleton<Dio>(() {
-    // Read networking config from .env (required)
-    final enableLoggingStr = dotenv.env['ENABLE_HTTP_LOGS']!;
-    final connectTimeoutMsStr = dotenv.env['DIO_CONNECT_TIMEOUT_MS']!;
-    final receiveTimeoutMsStr = dotenv.env['DIO_RECEIVE_TIMEOUT_MS']!;
-    final retriesStr = dotenv.env['RETRIES_MAX']!;
-
-    final enableLogging = enableLoggingStr.toLowerCase() == 'true';
-    final connectTimeoutMs = int.parse(connectTimeoutMsStr);
-    final receiveTimeoutMs = int.parse(receiveTimeoutMsStr);
-    final maxRetries = int.parse(retriesStr);
-
-    return DioConfig.createDio(
+     return DioConfig.createDio(
       baseUrl: dotenv.env['TMDB_BASE_URL']!,
       apiKey: dotenv.env['TMDB_API_KEY'],
-      connectTimeout: Duration(milliseconds: connectTimeoutMs),
-      receiveTimeout: Duration(milliseconds: receiveTimeoutMs),
-      enableLogging: enableLogging,
-      maxRetries: maxRetries,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      enableLogging: true,
+      maxRetries: 3,
     );
   });
 
