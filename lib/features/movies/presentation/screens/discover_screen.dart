@@ -4,6 +4,7 @@ import 'package:movie_discovery_app/features/movies/data/models/genre_model.dart
 import 'package:movie_discovery_app/features/movies/presentation/providers/discover_movies_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
+import 'package:movie_discovery_app/shared/widgets/shimmers/movie_card_shimmer.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
@@ -146,12 +147,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       itemCount: state.movies.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= state.movies.length) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return const MovieCardShimmer();
         }
         final movie = state.movies[index];
         return MovieCard(key: ValueKey(movie.id), movie: movie);

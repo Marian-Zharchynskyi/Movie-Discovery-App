@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/features/movies/data/models/genre_model.dart';
@@ -12,6 +13,8 @@ import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_c
 import 'package:movie_discovery_app/shared/widgets/rating_stars.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/image_shimmer.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_details_shimmer.dart';
+import 'package:movie_discovery_app/shared/widgets/shimmers/trailers_list_shimmer.dart';
+import 'package:movie_discovery_app/shared/widgets/shimmers/reviews_list_shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MovieDetailsScreen extends ConsumerWidget {
@@ -234,7 +237,7 @@ class _TrailersSection extends ConsumerWidget {
     final asyncVideos = ref.watch(movieVideosProvider(movieId));
 
     return asyncVideos.when(
-      loading: () => const SizedBox.shrink(),
+      loading: () => const TrailersListShimmer(),
       error: (_, _) => const SizedBox.shrink(),
       data: (videos) {
         final trailers = videos.where((v) => v.site == 'YouTube' && v.type == 'Trailer').toList();
@@ -334,8 +337,23 @@ class _TrailerCard extends StatelessWidget {
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    // On web, open in a new tab/window
+    if (kIsWeb) {
+      await launchUrl(
+        uri,
+        webOnlyWindowName: '_blank',
+      );
+      return;
+    }
+
+    // Try external application first; if not supported, fall back to default
+    final openedExternally = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!openedExternally) {
+      await launchUrl(uri, mode: LaunchMode.platformDefault);
     }
   }
 }
@@ -351,7 +369,7 @@ class _ReviewsSection extends ConsumerWidget {
     final asyncReviews = ref.watch(movieReviewsProvider(movieId));
 
     return asyncReviews.when(
-      loading: () => const SizedBox.shrink(),
+      loading: () => const ReviewsListShimmer(),
       error: (_, _) => const SizedBox.shrink(),
       data: (reviews) {
         if (reviews.isEmpty) return const SizedBox.shrink();
