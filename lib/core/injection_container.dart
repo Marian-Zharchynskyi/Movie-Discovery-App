@@ -32,6 +32,10 @@ import 'package:movie_discovery_app/features/movies/domain/repositories/movie_re
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_top_rated_movies.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_details.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_videos.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_reviews.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/discover_movies.dart';
+import 'package:movie_discovery_app/features/movies/domain/usecases/search_movies.dart';
 
 final sl = GetIt.instance;
 
@@ -69,6 +73,10 @@ Future<void> _initExternalDependencies() async {
   sl.registerFactory(() => GetPopularMovies(sl()));
   sl.registerFactory(() => GetTopRatedMovies(sl()));
   sl.registerFactory(() => GetMovieDetails(sl()));
+  sl.registerFactory(() => GetMovieVideos(sl()));
+  sl.registerFactory(() => GetMovieReviews(sl()));
+  sl.registerFactory(() => DiscoverMovies(sl()));
+  sl.registerFactory(() => SearchMovies(sl()));
   sl.registerFactory(() => GetFavoriteMovies(sl()));
   sl.registerFactory(() => AddToFavorites(sl()));
   sl.registerFactory(() => RemoveFromFavorites(sl()));

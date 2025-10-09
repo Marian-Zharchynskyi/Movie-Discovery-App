@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
+import 'package:movie_discovery_app/features/movies/presentation/screens/search_screen.dart';
+import 'package:movie_discovery_app/features/movies/presentation/screens/discover_screen.dart';
 import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
 
@@ -49,6 +51,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: const Text('Popular Movies'),
         actions: [
+          IconButton(
+            tooltip: 'Search',
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: 'Discover',
+            icon: const Icon(Icons.explore),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DiscoverScreen()),
+              );
+            },
+          ),
           IconButton(
             tooltip: 'Sign out',
             icon: const Icon(Icons.logout),

@@ -4,6 +4,8 @@ import 'package:movie_discovery_app/core/error/failures.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/local/movie_local_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
+import 'package:movie_discovery_app/features/movies/domain/entities/video_entity.dart';
+import 'package:movie_discovery_app/features/movies/domain/entities/review_entity.dart';
 import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
 
 class MovieRepositoryImpl implements MovieRepository {
@@ -82,6 +84,46 @@ class MovieRepositoryImpl implements MovieRepository {
           if (cached.isNotEmpty) return Right(cached);
         } catch (_) {}
       }
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<VideoEntity>>> getMovieVideos(int movieId) async {
+    try {
+      final videos = await remoteDataSource.getMovieVideos(movieId);
+      return Right(videos);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ReviewEntity>>> getMovieReviews(int movieId, {int page = 1}) async {
+    try {
+      final reviews = await remoteDataSource.getMovieReviews(movieId, page: page);
+      return Right(reviews);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<MovieEntity>>> discoverMovies({
+    int page = 1,
+    List<int>? genreIds,
+    int? year,
+    double? minRating,
+  }) async {
+    try {
+      final movies = await remoteDataSource.discoverMovies(
+        page: page,
+        genreIds: genreIds,
+        year: year,
+        minRating: minRating,
+      );
+      return Right(movies);
+    } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     }
   }
