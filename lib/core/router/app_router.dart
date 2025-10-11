@@ -6,6 +6,8 @@ import 'package:movie_discovery_app/features/auth/presentation/screens/login_scr
 import 'package:movie_discovery_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:movie_discovery_app/features/movies/presentation/screens/home_screen.dart';
+import 'package:movie_discovery_app/features/profile/presentation/screens/account_screen.dart';
+import 'package:movie_discovery_app/features/profile/presentation/screens/admin_users_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -14,6 +16,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/login',
     redirect: (context, state) {
       final isAuthenticated = authState.isAuthenticated;
+      final isAdmin = authState.user?.role == 'Admin';
       final isLoggingIn = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
 
@@ -24,6 +27,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // If authenticated and trying to access login/register
       if (isAuthenticated && isLoggingIn) {
+        return '/home';
+      }
+
+      // Admin-only protection
+      final isAdminRoute = state.matchedLocation.startsWith('/admin');
+      if (isAdminRoute && !isAdmin) {
         return '/home';
       }
 
@@ -56,6 +65,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: 'favorites',
             builder: (context, state) => const FavoritesScreen(),
           ),
+          GoRoute(
+            path: '/account',
+            name: 'account',
+            builder: (context, state) => const AccountScreen(),
+          ),
+          // Admin routes
+          GoRoute(
+            path: '/admin/users',
+            name: 'admin_users',
+            builder: (context, state) => const AdminUsersScreen(),
+          ),
         ],
       ),
     ],
@@ -87,6 +107,9 @@ class _MainShellState extends State<MainShell> {
       case 1:
         context.go('/favorites');
         break;
+      case 2:
+        context.go('/account');
+        break;
     }
   }
 
@@ -99,6 +122,8 @@ class _MainShellState extends State<MainShell> {
       _selectedIndex = 0;
     } else if (location.startsWith('/favorites')) {
       _selectedIndex = 1;
+    } else if (location.startsWith('/account')) {
+      _selectedIndex = 2;
     }
   }
 
@@ -115,6 +140,10 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
           ),
         ],
         currentIndex: _selectedIndex,

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:movie_discovery_app/core/error/exceptions.dart';
 import 'package:movie_discovery_app/core/error/failures.dart';
+import 'package:movie_discovery_app/core/services/mock_auth_api.dart';
 import 'package:movie_discovery_app/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:movie_discovery_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:movie_discovery_app/features/auth/domain/entities/user_entity.dart';
@@ -9,10 +10,12 @@ import 'package:movie_discovery_app/features/auth/domain/repositories/auth_repos
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final AuthLocalDataSource localDataSource;
+  final MockAuthApi mockAuthApi;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
+    required this.mockAuthApi,
   });
 
   @override
@@ -26,8 +29,13 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
       
-      // Store user ID as token
-      await localDataSource.storeToken(user.id);
+      // Generate app-level JWT for the Firebase user and store it securely
+      final jwt = mockAuthApi.createJwtForFirebaseUser(
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      );
+      await localDataSource.storeToken(jwt);
       
       return Right(user);
     } on ServerException catch (e) {
@@ -50,8 +58,13 @@ class AuthRepositoryImpl implements AuthRepository {
         displayName: displayName,
       );
       
-      // Store user ID as token
-      await localDataSource.storeToken(user.id);
+      // Generate app-level JWT for the Firebase user and store it securely
+      final jwt = mockAuthApi.createJwtForFirebaseUser(
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      );
+      await localDataSource.storeToken(jwt);
       
       return Right(user);
     } on ServerException catch (e) {

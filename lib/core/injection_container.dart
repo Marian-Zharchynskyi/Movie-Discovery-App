@@ -4,6 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:movie_discovery_app/core/network/dio_config.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:movie_discovery_app/core/services/mock_auth_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movie_discovery_app/core/database/app_database.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -65,6 +67,8 @@ Future<void> _initExternalDependencies() async {
   
   // FirebaseAuth
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  // FirebaseFirestore
+  sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   
   // Secure Storage
   sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
@@ -118,17 +122,26 @@ Future<void> _initExternalDependencies() async {
 }
 
 Future<void> _initAuthFeature() async {
+  // Mock Auth API (optional - can switch between Firebase and Mock)
+  sl.registerLazySingleton<MockAuthApi>(() => MockAuthApi());
+  
   // Data sources
+  // Use Firebase implementation as the primary auth provider
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(firebaseAuth: sl()),
+    () => AuthRemoteDataSourceImpl(firebaseAuth: sl(), firestore: sl()),
   );
+  
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(secureStorage: sl()),
   );
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+    () => AuthRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      mockAuthApi: sl(),
+    ),
   );
 
   // Use cases

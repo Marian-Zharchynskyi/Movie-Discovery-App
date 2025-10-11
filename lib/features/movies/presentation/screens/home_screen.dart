@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/screens/search_screen.dart';
 import 'package:movie_discovery_app/features/movies/presentation/screens/discover_screen.dart';
@@ -72,14 +72,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           IconButton(
-            tooltip: 'Sign out',
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authProvider.notifier).signOutUser();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Signed out')),
-              );
+            tooltip: 'Account',
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              context.go('/account');
             },
           ),
         ],

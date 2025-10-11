@@ -7,14 +7,16 @@ class UserModel extends UserEntity {
     required super.email,
     super.displayName,
     super.photoUrl,
+    super.role,
   });
 
-  factory UserModel.fromFirebaseUser(User user) {
+  factory UserModel.fromFirebaseUser(User user, {String role = 'User'}) {
     return UserModel(
       id: user.uid,
       email: user.email ?? '',
       displayName: user.displayName,
       photoUrl: user.photoURL,
+      role: role,
     );
   }
 
@@ -24,6 +26,7 @@ class UserModel extends UserEntity {
       'email': email,
       'displayName': displayName,
       'photoUrl': photoUrl,
+      'role': role,
     };
   }
 
@@ -33,6 +36,7 @@ class UserModel extends UserEntity {
       email: json['email'] as String,
       displayName: json['displayName'] as String?,
       photoUrl: json['photoUrl'] as String?,
+      role: (json['role'] as String?) ?? 'User',
     );
   }
 }
