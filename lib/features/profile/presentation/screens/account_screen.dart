@@ -6,6 +6,9 @@ import 'package:movie_discovery_app/core/injection_container.dart' as di;
 import 'package:movie_discovery_app/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:movie_discovery_app/features/settings/presentation/providers/settings_provider.dart';
 import 'package:movie_discovery_app/l10n/app_localizations.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('AccountScreen');
 
 class AccountScreen extends ConsumerWidget {
   static bool _printedTokenOnce = false;
@@ -22,9 +25,11 @@ class AccountScreen extends ConsumerWidget {
     if (!_printedTokenOnce) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         try {
-          final token = await di.sl<AuthLocalDataSource>().getStoredToken();
-          print('JWT Token: $token');
-        } catch (_) {}
+          final _ = await di.sl<AuthLocalDataSource>().getStoredToken();
+          _logger.fine('JWT Token retrieved');
+        } catch (e, stackTrace) {
+          _logger.severe('Failed to get JWT Token', e, stackTrace);
+        }
       });
       _printedTokenOnce = true;
     }
@@ -303,48 +308,60 @@ class AccountScreen extends ConsumerWidget {
     SettingsNotifier settingsNotifier,
     SettingsState settings,
   ) {
+    ThemeMode? selectedTheme = settings.themeMode;
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.theme),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<ThemeMode>(
-              title: Text(l10n.themeLight),
-              value: ThemeMode.light,
-              groupValue: settings.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  settingsNotifier.setThemeMode(value);
-                  Navigator.pop(context);
-                }
-              },
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text(l10n.theme),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<ThemeMode>(
+                  title: Text(l10n.themeLight),
+                  value: ThemeMode.light,
+                  groupValue: selectedTheme,
+                  onChanged: (ThemeMode? value) {
+                    if (value != null) {
+                      setState(() => selectedTheme = value);
+                      settingsNotifier.setThemeMode(value);
+                      _logger.info('Theme changed to: ${value.toString()}');
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                RadioListTile<ThemeMode>(
+                  title: Text(l10n.themeDark),
+                  value: ThemeMode.dark,
+                  groupValue: selectedTheme,
+                  onChanged: (ThemeMode? value) {
+                    if (value != null) {
+                      setState(() => selectedTheme = value);
+                      settingsNotifier.setThemeMode(value);
+                      _logger.info('Theme changed to: ${value.toString()}');
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                RadioListTile<ThemeMode>(
+                  title: Text(l10n.themeSystem),
+                  value: ThemeMode.system,
+                  groupValue: selectedTheme,
+                  onChanged: (ThemeMode? value) {
+                    if (value != null) {
+                      setState(() => selectedTheme = value);
+                      settingsNotifier.setThemeMode(value);
+                      _logger.info('Theme changed to: ${value.toString()}');
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              ],
             ),
-            RadioListTile<ThemeMode>(
-              title: Text(l10n.themeDark),
-              value: ThemeMode.dark,
-              groupValue: settings.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  settingsNotifier.setThemeMode(value);
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(l10n.themeSystem),
-              value: ThemeMode.system,
-              groupValue: settings.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  settingsNotifier.setThemeMode(value);
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
