@@ -16,6 +16,7 @@ import 'package:movie_discovery_app/shared/widgets/shimmers/movie_details_shimme
 import 'package:movie_discovery_app/shared/widgets/shimmers/trailers_list_shimmer.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/reviews_list_shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class MovieDetailsScreen extends ConsumerWidget {
   final MovieEntity movie;
@@ -45,13 +46,13 @@ class MovieDetailsScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.error_outline, color: Colors.red, size: 48),
                 const SizedBox(height: 12),
-                Text('Failed to load details', style: theme.textTheme.titleMedium),
+                Text(AppLocalizations.of(context).failedToLoadDetails, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Text('$err', textAlign: TextAlign.center, style: theme.textTheme.bodySmall),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () => ref.refresh(movieDetailsProvider(movie.id)),
-                  child: const Text('Retry'),
+                  child: Text(AppLocalizations.of(context).retry),
                 ),
               ],
             ),
@@ -97,7 +98,7 @@ class MovieDetailsScreen extends ConsumerWidget {
                     // Overview
                     if (m.overview.isNotEmpty) ...[
                       Text(
-                        'Overview',
+                        AppLocalizations.of(context).overview,
                         style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8.0),
@@ -201,7 +202,7 @@ class _BasicInfo extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8.0),
-        Text('Release: $releaseYear', style: theme.textTheme.bodyMedium),
+        Text('${AppLocalizations.of(context).releaseLabel}: $releaseYear', style: theme.textTheme.bodyMedium),
         if (movie.genreIds.isNotEmpty) ...[
           const SizedBox(height: 8.0),
           Wrap(
@@ -247,7 +248,7 @@ class _TrailersSection extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Trailers',
+              AppLocalizations.of(context).trailers,
               style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12.0),
@@ -378,7 +379,7 @@ class _ReviewsSection extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Reviews',
+              AppLocalizations.of(context).reviews,
               style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12.0),

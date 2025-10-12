@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/search_movies_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -31,7 +32,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           controller: _searchController,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: 'Search movies...',
+            hintText: AppLocalizations.of(context).searchMoviesHint,
             border: InputBorder.none,
             hintStyle: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -81,7 +82,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Search for movies',
+              AppLocalizations.of(context).searchForMovies,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
@@ -103,14 +104,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             const Icon(Icons.error_outline, color: Colors.red, size: 48),
             const SizedBox(height: 16),
             Text(
-              'Error: ${state.errorMessage}',
+              '${AppLocalizations.of(context).error}: ${state.errorMessage}',
               style: const TextStyle(color: Colors.red, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => ref.read(searchMoviesProvider.notifier).search(state.query),
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),
@@ -129,7 +130,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No movies found',
+              AppLocalizations.of(context).noMoviesFound,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),

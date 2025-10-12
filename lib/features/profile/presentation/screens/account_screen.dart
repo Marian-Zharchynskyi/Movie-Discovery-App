@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:movie_discovery_app/core/injection_container.dart' as di;
 import 'package:movie_discovery_app/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:movie_discovery_app/features/settings/presentation/providers/settings_provider.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class AccountScreen extends ConsumerWidget {
   static bool _printedTokenOnce = false;
@@ -13,6 +15,9 @@ class AccountScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
+    final l10n = AppLocalizations.of(context);
+    final settingsNotifier = ref.read(settingsProvider.notifier);
+    final settings = ref.watch(settingsProvider);
 
     if (!_printedTokenOnce) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -26,7 +31,7 @@ class AccountScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account'),
+        title: Text(l10n.account),
         elevation: 0,
       ),
       body: user == null
@@ -94,25 +99,76 @@ class AccountScreen extends ConsumerWidget {
                   // Account Information Section
                   _buildSection(
                     context,
-                    title: 'Account Information',
+                    l10n,
+                    title: l10n.accountInformation,
                     children: [
                       _buildInfoTile(
                         context,
+                        l10n,
                         icon: Icons.person,
-                        title: 'Display Name',
-                        subtitle: user.displayName ?? 'Not set',
+                        title: l10n.displayName,
+                        subtitle: user.displayName ?? l10n.notSet,
                       ),
                       _buildInfoTile(
                         context,
+                        l10n,
                         icon: Icons.email,
-                        title: 'Email',
+                        title: l10n.email,
                         subtitle: user.email,
                       ),
                       _buildInfoTile(
                         context,
+                        l10n,
                         icon: Icons.fingerprint,
-                        title: 'User ID',
+                        title: l10n.userId,
                         subtitle: user.id,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Preferences Section
+                  _buildSection(
+                    context,
+                    l10n,
+                    title: l10n.preferences,
+                    children: [
+                      // Theme Toggle
+                      ListTile(
+                        leading: Icon(
+                          settings.themeMode == ThemeMode.dark
+                              ? Icons.dark_mode
+                              : settings.themeMode == ThemeMode.light
+                                  ? Icons.light_mode
+                                  : Icons.brightness_auto,
+                        ),
+                        title: Text(l10n.theme),
+                        subtitle: Text(
+                          settings.themeMode == ThemeMode.dark
+                              ? l10n.themeDark
+                              : settings.themeMode == ThemeMode.light
+                                  ? l10n.themeLight
+                                  : l10n.themeSystem,
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          _showThemeDialog(context, l10n, settingsNotifier, settings);
+                        },
+                      ),
+                      // Language Toggle
+                      ListTile(
+                        leading: const Icon(Icons.language),
+                        title: Text(l10n.language),
+                        subtitle: Text(
+                          settings.locale?.languageCode == 'uk'
+                              ? l10n.languageUkrainian
+                              : l10n.languageEnglish,
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          _showLanguageDialog(context, l10n, settingsNotifier, settings);
+                        },
                       ),
                     ],
                   ),
@@ -122,12 +178,13 @@ class AccountScreen extends ConsumerWidget {
                   // Settings Section
                   _buildSection(
                     context,
-                    title: 'Settings',
+                    l10n,
+                    title: l10n.settings,
                     children: [
                       if (user.role == 'Admin')
                         ListTile(
                           leading: const Icon(Icons.supervisor_account),
-                          title: const Text('Manage Users'),
+                          title: Text(l10n.manageUsers),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
                             context.go('/admin/users');
@@ -135,39 +192,36 @@ class AccountScreen extends ConsumerWidget {
                         ),
                       ListTile(
                         leading: const Icon(Icons.edit),
-                        title: const Text('Edit Profile'),
+                        title: Text(l10n.editProfile),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          // TODO: Navigate to edit profile screen
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Edit profile coming soon'),
+                            SnackBar(
+                              content: Text(l10n.editProfileComingSoon),
                             ),
                           );
                         },
                       ),
                       ListTile(
                         leading: const Icon(Icons.lock),
-                        title: const Text('Change Password'),
+                        title: Text(l10n.changePassword),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          // TODO: Navigate to change password screen
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Change password coming soon'),
+                            SnackBar(
+                              content: Text(l10n.changePasswordComingSoon),
                             ),
                           );
                         },
                       ),
                       ListTile(
                         leading: const Icon(Icons.notifications),
-                        title: const Text('Notifications'),
+                        title: Text(l10n.notifications),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          // TODO: Navigate to notifications settings
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Notifications settings coming soon'),
+                            SnackBar(
+                              content: Text(l10n.notificationsSettingsComingSoon),
                             ),
                           );
                         },
@@ -180,7 +234,8 @@ class AccountScreen extends ConsumerWidget {
                   // Actions Section
                   _buildSection(
                     context,
-                    title: 'Actions',
+                    l10n,
+                    title: l10n.actions,
                     children: [
                       ListTile(
                         leading: Icon(
@@ -188,7 +243,7 @@ class AccountScreen extends ConsumerWidget {
                           color: Theme.of(context).colorScheme.error,
                         ),
                         title: Text(
-                          'Sign Out',
+                          l10n.signOut,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -197,18 +252,16 @@ class AccountScreen extends ConsumerWidget {
                           final shouldSignOut = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Sign Out'),
-                              content: const Text(
-                                'Are you sure you want to sign out?',
-                              ),
+                              title: Text(l10n.signOut),
+                              content: Text(l10n.signOutConfirm),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
+                                  child: Text(l10n.cancel),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Sign Out'),
+                                  child: Text(l10n.signOut),
                                 ),
                               ],
                             ),
@@ -229,7 +282,7 @@ class AccountScreen extends ConsumerWidget {
 
                   // App Version
                   Text(
-                    'Version 1.0.0',
+                    '${l10n.version} 1.0.0',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context)
                               .colorScheme
@@ -244,8 +297,102 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
+  void _showThemeDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsNotifier settingsNotifier,
+    SettingsState settings,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.theme),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<ThemeMode>(
+              title: Text(l10n.themeLight),
+              value: ThemeMode.light,
+              groupValue: settings.themeMode,
+              onChanged: (value) {
+                if (value != null) {
+                  settingsNotifier.setThemeMode(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: Text(l10n.themeDark),
+              value: ThemeMode.dark,
+              groupValue: settings.themeMode,
+              onChanged: (value) {
+                if (value != null) {
+                  settingsNotifier.setThemeMode(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: Text(l10n.themeSystem),
+              value: ThemeMode.system,
+              groupValue: settings.themeMode,
+              onChanged: (value) {
+                if (value != null) {
+                  settingsNotifier.setThemeMode(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsNotifier settingsNotifier,
+    SettingsState settings,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<String>(
+              title: Text(l10n.languageEnglish),
+              value: 'en',
+              groupValue: settings.locale?.languageCode ?? 'en',
+              onChanged: (value) {
+                if (value != null) {
+                  settingsNotifier.setLocale(Locale(value));
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            RadioListTile<String>(
+              title: Text(l10n.languageUkrainian),
+              value: 'uk',
+              groupValue: settings.locale?.languageCode ?? 'en',
+              onChanged: (value) {
+                if (value != null) {
+                  settingsNotifier.setLocale(Locale(value));
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSection(
-    BuildContext context, {
+    BuildContext context,
+    AppLocalizations l10n, {
     required String title,
     required List<Widget> children,
   }) {
@@ -273,7 +420,8 @@ class AccountScreen extends ConsumerWidget {
   }
 
   Widget _buildInfoTile(
-    BuildContext context, {
+    BuildContext context,
+    AppLocalizations l10n, {
     required IconData icon,
     required String title,
     required String subtitle,

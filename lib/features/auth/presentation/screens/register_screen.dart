@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -66,7 +67,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Create Account',
+                    AppLocalizations.of(context).createAccount,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.primary,
@@ -75,7 +76,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Sign up to get started',
+                    AppLocalizations.of(context).signUpToGetStarted,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -88,7 +89,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _nameController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
-                      labelText: 'Full Name',
+                      labelText: AppLocalizations.of(context).fullName,
                       prefixIcon: const Icon(Icons.person_outlined),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -96,7 +97,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
+                        return AppLocalizations.of(context).pleaseEnterName;
                       }
                       return null;
                     },
@@ -108,7 +109,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: AppLocalizations.of(context).email,
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -116,10 +117,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
+                        return AppLocalizations.of(context).pleaseEnterEmail;
                       }
                       if (!value.contains('@')) {
-                        return 'Please enter a valid email';
+                        return AppLocalizations.of(context).pleaseEnterValidEmail;
                       }
                       return null;
                     },
@@ -131,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: AppLocalizations.of(context).password,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -151,10 +152,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
+                        return AppLocalizations.of(context).pleaseEnterPassword;
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return AppLocalizations.of(context).passwordMinLength;
                       }
                       return null;
                     },
@@ -166,7 +167,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
                     decoration: InputDecoration(
-                      labelText: 'Confirm Password',
+                      labelText: AppLocalizations.of(context).confirmPassword,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -186,10 +187,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
+                        return AppLocalizations.of(context).pleaseConfirmPassword;
                       }
                       if (value != _passwordController.text) {
-                        return 'Passwords do not match';
+                        return AppLocalizations.of(context).passwordsDoNotMatch;
                       }
                       return null;
                     },
@@ -242,9 +243,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
-                            'Sign Up',
-                            style: TextStyle(fontSize: 16),
+                        : Text(
+                            AppLocalizations.of(context).signUp,
+                            style: const TextStyle(fontSize: 16),
                           ),
                   ),
                   const SizedBox(height: 16),
@@ -254,14 +255,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Already have an account? ',
+                        AppLocalizations.of(context).alreadyHaveAccount,
                         style: theme.textTheme.bodyMedium,
                       ),
                       TextButton(
                         onPressed: () {
                           context.go('/login');
                         },
-                        child: const Text('Sign In'),
+                        child: Text(AppLocalizations.of(context).signIn),
                       ),
                     ],
                   ),

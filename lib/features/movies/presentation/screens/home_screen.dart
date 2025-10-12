@@ -6,6 +6,7 @@ import 'package:movie_discovery_app/features/movies/presentation/screens/search_
 import 'package:movie_discovery_app/features/movies/presentation/screens/discover_screen.dart';
 import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -49,10 +50,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Popular Movies'),
+        title: Text(AppLocalizations.of(context).popularMovies),
         actions: [
           IconButton(
-            tooltip: 'Search',
+            tooltip: AppLocalizations.of(context).search,
             icon: const Icon(Icons.search),
             onPressed: () {
               Navigator.push(
@@ -62,7 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           IconButton(
-            tooltip: 'Discover',
+            tooltip: AppLocalizations.of(context).discover,
             icon: const Icon(Icons.explore),
             onPressed: () {
               Navigator.push(
@@ -72,7 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           IconButton(
-            tooltip: 'Account',
+            tooltip: AppLocalizations.of(context).account,
             icon: const Icon(Icons.person),
             onPressed: () {
               context.go('/account');
@@ -108,14 +109,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Error: ${state.errorMessage}',
+              '${AppLocalizations.of(context).error}: ${state.errorMessage}',
               style: const TextStyle(color: Colors.red, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => ref.read(movieProvider.notifier).fetchPopularMovies(),
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),
@@ -123,7 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     if (state.movies.isEmpty) {
-      return const Center(child: Text('No movies found'));
+      return Center(child: Text(AppLocalizations.of(context).noMoviesFound));
     }
 
     return GridView.builder(

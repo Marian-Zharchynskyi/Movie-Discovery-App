@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/widgets/favorite_movie_item.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -37,7 +38,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Favorites'),
+        title: Text(AppLocalizations.of(context).myFavorites),
         centerTitle: true,
         elevation: 0,
       ),
@@ -60,7 +61,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Error loading favorites',
+              AppLocalizations.of(context).errorLoadingFavorites,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -72,7 +73,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadFavorites,
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),
@@ -97,14 +98,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No favorites yet',
+                    AppLocalizations.of(context).noFavoritesYet,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tap the heart icon on any movie to add it to your favorites',
+                    AppLocalizations.of(context).tapHeartToAddFavorites,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -139,8 +140,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       await ref.read(favoritesProvider.notifier).removeFromFavorites(movieId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Removed from favorites'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).removedFromFavorites),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -149,7 +150,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to remove: ${e.toString()}'),
+            content: Text('${AppLocalizations.of(context).failedToRemove}: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
           ),

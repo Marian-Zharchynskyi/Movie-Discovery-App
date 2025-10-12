@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/injection_container.dart' as di;
 import 'core/router/app_router.dart';
 import 'firebase_options.dart';
 import 'features/settings/presentation/providers/settings_provider.dart';
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +40,13 @@ class _MovieDiscoveryAppState extends State<MovieDiscoveryApp> {
           title: 'Movie Discovery',
           debugShowCheckedModeBanner: false,
           locale: settings.locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           themeMode: settings.themeMode,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(

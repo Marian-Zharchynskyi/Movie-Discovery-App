@@ -8,6 +8,7 @@ import 'package:movie_discovery_app/features/favorites/presentation/screens/favo
 import 'package:movie_discovery_app/features/movies/presentation/screens/home_screen.dart';
 import 'package:movie_discovery_app/features/profile/presentation/screens/account_screen.dart';
 import 'package:movie_discovery_app/features/profile/presentation/screens/admin_users_screen.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -132,18 +133,18 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home),
+            label: AppLocalizations.of(context).home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: const Icon(Icons.favorite),
+            label: AppLocalizations.of(context).favorites,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
+            icon: const Icon(Icons.person),
+            label: AppLocalizations.of(context).account,
           ),
         ],
         currentIndex: _selectedIndex,
