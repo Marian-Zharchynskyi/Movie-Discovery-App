@@ -319,43 +319,46 @@ class AccountScreen extends ConsumerWidget {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile<ThemeMode>(
+                ListTile(
                   title: Text(l10n.themeLight),
-                  value: ThemeMode.light,
-                  groupValue: selectedTheme,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      setState(() => selectedTheme = value);
-                      settingsNotifier.setThemeMode(value);
-                      _logger.info('Theme changed to: ${value.toString()}');
-                      Navigator.pop(context);
-                    }
+                  trailing: Icon(
+                    selectedTheme == ThemeMode.light
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
+                  ),
+                  onTap: () {
+                    setState(() => selectedTheme = ThemeMode.light);
+                    settingsNotifier.setThemeMode(ThemeMode.light);
+                    _logger.info('Theme changed to: ${ThemeMode.light.toString()}');
+                    Navigator.pop(context);
                   },
                 ),
-                RadioListTile<ThemeMode>(
+                ListTile(
                   title: Text(l10n.themeDark),
-                  value: ThemeMode.dark,
-                  groupValue: selectedTheme,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      setState(() => selectedTheme = value);
-                      settingsNotifier.setThemeMode(value);
-                      _logger.info('Theme changed to: ${value.toString()}');
-                      Navigator.pop(context);
-                    }
+                  trailing: Icon(
+                    selectedTheme == ThemeMode.dark
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
+                  ),
+                  onTap: () {
+                    setState(() => selectedTheme = ThemeMode.dark);
+                    settingsNotifier.setThemeMode(ThemeMode.dark);
+                    _logger.info('Theme changed to: ${ThemeMode.dark.toString()}');
+                    Navigator.pop(context);
                   },
                 ),
-                RadioListTile<ThemeMode>(
+                ListTile(
                   title: Text(l10n.themeSystem),
-                  value: ThemeMode.system,
-                  groupValue: selectedTheme,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      setState(() => selectedTheme = value);
-                      settingsNotifier.setThemeMode(value);
-                      _logger.info('Theme changed to: ${value.toString()}');
-                      Navigator.pop(context);
-                    }
+                  trailing: Icon(
+                    selectedTheme == ThemeMode.system
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
+                  ),
+                  onTap: () {
+                    setState(() => selectedTheme = ThemeMode.system);
+                    settingsNotifier.setThemeMode(ThemeMode.system);
+                    _logger.info('Theme changed to: ${ThemeMode.system.toString()}');
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -379,26 +382,38 @@ class AccountScreen extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RadioListTile<String>(
-              title: Text(l10n.languageEnglish),
-              value: 'en',
-              groupValue: settings.locale?.languageCode ?? 'en',
-              onChanged: (value) {
-                if (value != null) {
-                  settingsNotifier.setLocale(Locale(value));
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: Text(l10n.languageUkrainian),
-              value: 'uk',
-              groupValue: settings.locale?.languageCode ?? 'en',
-              onChanged: (value) {
-                if (value != null) {
-                  settingsNotifier.setLocale(Locale(value));
-                  Navigator.pop(context);
-                }
+            Builder(
+              builder: (context) {
+                final current = settings.locale?.languageCode ?? 'en';
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(l10n.languageEnglish),
+                      trailing: Icon(
+                        current == 'en'
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                      ),
+                      onTap: () {
+                        settingsNotifier.setLocale(const Locale('en'));
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: Text(l10n.languageUkrainian),
+                      trailing: Icon(
+                        current == 'uk'
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                      ),
+                      onTap: () {
+                        settingsNotifier.setLocale(const Locale('uk'));
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
               },
             ),
           ],
