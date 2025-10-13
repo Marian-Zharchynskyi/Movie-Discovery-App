@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:movie_discovery_app/features/favorites/domain/entities/favorite_movie_entity.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
+import 'package:movie_discovery_app/features/favorites/presentation/widgets/favorite_movie_item.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -14,135 +15,149 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(favoritesProvider.notifier).loadFavoriteMovies(),
-    );
+    // Use addPostFrameCallback to safely access ref after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadFavorites();
+    });
+  }
+
+  Future<void> _loadFavorites() async {
+    if (mounted) {
+      await ref.read(favoritesProvider.notifier).loadFavoriteMovies();
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    await _loadFavorites();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(favoritesProvider);
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: Text(AppLocalizations.of(context).myFavorites),
+        centerTitle: true,
+        elevation: 0,
       ),
-      body: _buildBody(state),
+      body: _buildBody(state, theme),
     );
   }
 
-  Widget _buildBody(FavoritesState state) {
-    if (state.isLoading) {
+  Widget _buildBody(FavoritesState state, ThemeData theme) {
+    if (state.isLoading && state.favoriteMovies.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    if (state.error != null) {
+    if (state.error != null && state.favoriteMovies.isEmpty) {
       return Center(
-        child: Text('Error: ${state.error}'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context).errorLoadingFavorites,
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              state.error!,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadFavorites,
+              child: Text(AppLocalizations.of(context).retry),
+            ),
+          ],
+        ),
       );
     }
 
     if (state.favoriteMovies.isEmpty) {
-      return const Center(
-        child: Text('No favorite movies yet'),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: state.favoriteMovies.length,
-      itemBuilder: (context, index) {
-        final movie = state.favoriteMovies[index];
-        return FavoriteMovieCard(movie: movie);
-      },
-    );
-  }
-}
-
-class FavoriteMovieCard extends StatelessWidget {
-  final FavoriteMovieEntity movie;
-
-  const FavoriteMovieCard({super.key, required this.movie});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 60,
-              height: 90,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: movie.posterPath != null
-                    ? DecorationImage(
-                        image: NetworkImage(movie.fullPosterPath),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-                color: Colors.grey[300],
-              ),
-              child: movie.posterPath == null
-                  ? const Icon(Icons.movie, size: 30)
-                  : null,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
+      return RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    movie.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Icon(
+                    Icons.favorite_border,
+                    size: 64,
+                    color: theme.hintColor.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 16),
                   Text(
-                    'Added: ${_formatDate(movie.dateAdded)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+                    AppLocalizations.of(context).noFavoritesYet,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                      Text(
-                        movie.voteAverage.toString(),
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
+                  Text(
+                    AppLocalizations.of(context).tapHeartToAddFavorites,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
                   ),
                 ],
               ),
             ),
-            Consumer(
-              builder: (context, ref, _) {
-                return IconButton(
-                  onPressed: () {
-                    ref
-                        .read(favoritesProvider.notifier)
-                        .removeMovieFromFavorites(movie.id);
-                  },
-                  icon: const Icon(Icons.favorite, color: Colors.red),
-                );
-              },
-            ),
-          ],
+          ),
         ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: state.favoriteMovies.length,
+        itemBuilder: (context, index) {
+          final movie = state.favoriteMovies[index];
+          return FavoriteMovieItem(
+            movie: movie,
+            onRemove: () => _removeFromFavorites(movie.id),
+          );
+        },
       ),
     );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+  Future<void> _removeFromFavorites(int movieId) async {
+    try {
+      await ref.read(favoritesProvider.notifier).removeFromFavorites(movieId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context).removedFromFavorites),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${AppLocalizations.of(context).failedToRemove}: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
+
+
 }
