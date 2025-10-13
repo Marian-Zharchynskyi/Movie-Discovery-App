@@ -12,6 +12,11 @@
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
 
+# Google Play Core (required for Flutter deferred components / Play Store split installs)
+-keep class com.google.android.play.core.** { *; }
+-keep class com.google.android.play.** { *; }
+-dontwarn com.google.android.play.**
+
 # Gson (if used by Firebase or other libraries)
 -keepattributes Signature
 -keepattributes *Annotation*
