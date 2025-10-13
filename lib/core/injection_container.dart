@@ -19,6 +19,7 @@ import 'package:movie_discovery_app/features/auth/domain/usecases/get_current_us
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_in.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_out.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_up.dart';
+import 'package:movie_discovery_app/features/auth/domain/usecases/get_stored_token.dart';
 
 import 'package:movie_discovery_app/features/favorites/data/datasources/local/favorites_local_data_source.dart';
 import 'package:movie_discovery_app/features/favorites/data/repositories/favorites_repository_impl.dart';
@@ -27,6 +28,7 @@ import 'package:movie_discovery_app/features/favorites/domain/usecases/add_to_fa
 import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favorite_movies.dart';
 import 'package:movie_discovery_app/features/favorites/domain/usecases/is_favorite.dart';
 import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_from_favorites.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favorites_count.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/local/movie_local_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/repositories/movie_repository_impl.dart';
@@ -39,6 +41,16 @@ import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_re
 import 'package:movie_discovery_app/features/movies/domain/usecases/discover_movies.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/search_movies.dart';
 
+// Profile feature
+import 'package:movie_discovery_app/features/profile/data/datasources/profile_local_data_source.dart';
+import 'package:movie_discovery_app/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:movie_discovery_app/features/profile/domain/repositories/profile_repository.dart';
+import 'package:movie_discovery_app/features/profile/domain/usecases/get_profile.dart';
+import 'package:movie_discovery_app/features/profile/domain/usecases/get_theme_mode.dart';
+import 'package:movie_discovery_app/features/profile/domain/usecases/set_theme_mode.dart';
+import 'package:movie_discovery_app/features/profile/domain/usecases/get_locale_code.dart';
+import 'package:movie_discovery_app/features/profile/domain/usecases/set_locale_code.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -49,7 +61,7 @@ Future<void> init() async {
   await _initAuthFeature();
   // await _initMoviesFeature();
   // await _initFavoritesFeature();
-  // await _initProfileFeature();
+  await _initProfileFeature();
 }
 
 Future<void> _initExternalDependencies() async {
@@ -85,6 +97,7 @@ Future<void> _initExternalDependencies() async {
   sl.registerFactory(() => AddToFavorites(sl()));
   sl.registerFactory(() => RemoveFromFavorites(sl()));
   sl.registerFactory(() => IsFavorite(sl()));
+  sl.registerFactory(() => GetFavoritesCount(sl()));
   
   // Register repositories
   sl.registerLazySingleton<MovieRepository>(
@@ -149,4 +162,27 @@ Future<void> _initAuthFeature() async {
   sl.registerFactory(() => SignUp(sl()));
   sl.registerFactory(() => SignOut(sl()));
   sl.registerFactory(() => GetCurrentUser(sl()));
+  sl.registerFactory(() => GetStoredToken(sl()));
+}
+
+Future<void> _initProfileFeature() async {
+  // Data source
+  sl.registerLazySingleton<ProfileLocalDataSource>(
+    () => ProfileLocalDataSourceImpl(prefs: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      authRepository: sl(),
+      localDataSource: sl(),
+    ),
+  );
+
+  // Use cases
+  sl.registerFactory(() => GetProfile(sl()));
+  sl.registerFactory(() => GetThemeMode(sl()));
+  sl.registerFactory(() => SetThemeMode(sl()));
+  sl.registerFactory(() => GetLocaleCode(sl()));
+  sl.registerFactory(() => SetLocaleCode(sl()));
 }
