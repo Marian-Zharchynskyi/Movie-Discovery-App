@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
@@ -13,6 +14,7 @@ import 'package:movie_discovery_app/features/auth/domain/usecases/get_current_us
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_in.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_out.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_up.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 // Mocks
 class MockGetPopularMovies extends Mock implements GetPopularMovies {}
@@ -63,8 +65,15 @@ void main() {
             );
           }),
         ],
-        child: const MaterialApp(
-          home: HomeScreen(),
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const HomeScreen(),
         ),
       ),
     );
