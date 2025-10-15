@@ -47,9 +47,6 @@ app.*.map.json
 # Environment variables
 .env
 
-# Screenshots
-docs/screenshots/
-
 # Local development files
 .localenv
 
