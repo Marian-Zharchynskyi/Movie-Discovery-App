@@ -29,8 +29,6 @@ android {
       targetSdk = flutter.targetSdkVersion
       versionCode = flutter.versionCode
       versionName = flutter.versionName
-      // Force using standard FlutterApplication instead of PlayStore split application
-      manifestPlaceholders["applicationName"] = "io.flutter.embedding.android.FlutterApplication"
   }
 
     buildTypes {
@@ -52,4 +50,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
 }

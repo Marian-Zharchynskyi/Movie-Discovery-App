@@ -2,126 +2,94 @@
 
 ![Flutter CI](https://github.com/Marian-Zharchynskyi/Movie-Discovery-App/actions/workflows/flutter.yml/badge.svg)
 
-A Flutter application for discovering and managing favorite movies using TMDB API.
+## 🎯 Обрана тема
 
-## Features
+Movie Discovery
 
-- 🔐 **Firebase Authentication** - Secure user authentication
-- 🔒 **Secure Storage** - Token storage using `flutter_secure_storage`
-- 🎬 **Movie Discovery** - Browse popular movies with lazy loading (pagination)
-- ⭐ **Favorites** - Save and manage favorite movies
-- 🖼️ **Optimized Image Caching** - Using `cached_network_image` for efficient image loading
-- 📱 **Responsive Design** - Adaptive grid layout for different screen sizes
-- 🗄️ **Local Database** - Drift (SQLite) for offline data persistence
-- 🔄 **State Management** - Riverpod for reactive state management
+## 🏗️ Архітектура
 
-## Architecture
+- Clean Architecture (3 layers)
+- Riverpod for state management (`flutter_riverpod`)
+- Repository Pattern + DI (`get_it`)
 
-The project follows **Clean Architecture** principles with three main layers:
+Директорії: `lib/core/`, `lib/features/`, `lib/shared/`, локалізація в `lib/l10n/`.
 
-- **Presentation Layer** - UI components, screens, and state management (Riverpod)
-- **Domain Layer** - Business logic, entities, and use cases
-- **Data Layer** - Repositories, data sources (remote & local), and models
+## 🌐 API Integration
 
-## Security & Optimization
+- TMDB API via `dio` (API key через `.env` з `flutter_dotenv`)
+- Firebase Auth (`firebase_auth`, `firebase_core`)
+- Firestore (`cloud_firestore`) для користувацьких даних (наприклад, вподобання)
+- Offline-first: `drift` (SQLite) + `hive`/`shared_preferences` + `cached_network_image`
+- Error handling: `dartz` (`Either`) + інтерсептори в `lib/core/network/dio_config.dart`
 
-### Secure Storage
-Authentication tokens are securely stored using `flutter_secure_storage` to prevent unauthorized access.
+## 🚀 Features
 
-### Image Caching
-All movie posters and images are cached using `cached_network_image` to:
-- Reduce network bandwidth
-- Improve loading performance
-- Enable offline viewing of previously loaded images
+- Аутентифікація (email/password) через Firebase
+- Відкриття/перегляд популярних фільмів з пагінацією
+- Деталі фільму: опис, рейтинг, рецензії, відео/трейлери
+- Пошук фільмів, базові фільтри
+- Обране (додавання/видалення), екран `favorites`
+- Кешування зображень та офлайн-перегляд раніше завантаженого
+- Маршрутизація з `go_router`
+- Налаштування (наприклад, тема) через `features/settings/`
+- Локалізація (папка `l10n/`)
 
-### Lazy Loading
-Movie lists implement pagination with automatic loading when scrolling near the bottom (90% threshold), reducing initial load time and memory usage.
+## 🧪 Testing
 
-### Code Obfuscation
-Release builds are configured with ProGuard for Android to:
-- Obfuscate code and make reverse engineering difficult
-- Shrink resources and reduce APK size
-- Remove unused code and optimize performance
+- Unit tests: моделі/сутності (див. `test/features/movies/domain/`)
+- Widget tests: компоненти UI (наприклад, `movie_card_test.dart`)
+- Integration tests: базові сценарії налаштовані (папка `integration_test/`)
 
-## Building the App
+## 📱 Screenshots
 
-### Development Build
-```bash
-flutter run
-```
+| Login screen | Main screen |
+|-------------|---------------|
+| <img src="docs/screenshots/login_screen.png" width="300"> | <img src="docs/screenshots/main_screen.png" width="300"> |
 
-### Release Build (Android) with Obfuscation
-```bash
-# Standard release build with obfuscation
-flutter build apk --release
+| Details screen | Account screen |
+|--------|-----------|
+| <img src="docs/screenshots/details_screen.png" width="300"> | <img src="docs/screenshots/account_screen.png" width="300"> |
 
-# With custom obfuscation symbols file
-flutter build apk --release --obfuscate --split-debug-info=build/app/outputs/symbols
+## 🛠️ Setup Instructions
 
-# Build App Bundle (recommended for Play Store)
-flutter build appbundle --release --obfuscate --split-debug-info=build/app/outputs/symbols
-```
-
-### Release Build (iOS)
-```bash
-flutter build ios --release --obfuscate --split-debug-info=build/ios/symbols
-```
-
-**Note**: The `--split-debug-info` flag saves symbol mapping files needed for crash reporting and debugging obfuscated builds.
-
-## CI/CD
-
-- **Trigger branches**: pushes and pull requests targeting `main` or `develop` run the workflow at `.github/workflows/flutter.yml`.
-- **Continuous Integration**: executes `flutter analyze` and `flutter test --coverage`. The generated `coverage/lcov.info` file is uploaded as an artifact (`coverage-lcov`).
-- **Continuous Delivery (artifacts)**: builds
-  - `app-release-apk` at `build/app/outputs/flutter-apk/app-release.apk`
-  - `app-unsigned-ipa` at `build/ios/ipa/`
-  Download them from the run summary in the GitHub Actions tab for manual signing and store publishing.
-- **Next step**: integrate automated store uploads (e.g., Firebase App Distribution, App Store Connect) once signing credentials are available.
-
-## Setup
-
-1. **Clone the repository**
+1. Clone repository
    ```bash
    git clone https://github.com/Marian-Zharchynskyi/Movie-Discovery-App.git
    cd Movie-Discovery-App
    ```
-
-2. **Install dependencies**
+2. Add API keys to .env
+   ```
+   TMDB_API_KEY=your_api_key_here
+   ```
+3. Configure Firebase
+   - Додайте `google-services.json` (Android) та `GoogleService-Info.plist` (iOS)
+   - Перевірте `lib/firebase_options.dart`
+4. Install deps
    ```bash
    flutter pub get
    ```
-
-3. **Configure Firebase**
-   - Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS)
-   - Update Firebase configuration in `lib/firebase_options.dart`
-
-4. **Set up environment variables**
-   - Create a `.env` file in the root directory
-   - Add your TMDB API key:
-     ```
-     TMDB_API_KEY=your_api_key_here
-     ```
-
-5. **Run the app**
+5. Run
    ```bash
    flutter run
    ```
 
-## Dependencies
+## 🔧 CI/CD
 
-Key packages used:
-- `flutter_riverpod` - State management
-- `dio` - HTTP client
-- `drift` - SQLite database
-- `flutter_secure_storage` - Secure token storage
-- `cached_network_image` - Image caching
-- `firebase_auth` & `firebase_core` - Authentication
-- `get_it` - Dependency injection
-- `dartz` - Functional programming (Either type)
+- Автоматичні `flutter analyze` та тести на кожен push/PR (`.github/workflows/flutter.yml`)
+- Артефакти збірок: APK/AAB, iOS IPA (unsigned) у GitHub Actions
+- Code coverage: завантаження `coverage/lcov.info` як артефакт
 
-## Resources
+## 📊 Performance Optimizations
 
-- [TMDB API Documentation](https://developers.themoviedb.org/3)
-- [Flutter Documentation](https://docs.flutter.dev/)
-- [Firebase Documentation](https://firebase.google.com/docs)
+- `cached_network_image` для кешування картинок
+- Пагінація списків (зниження навантаження та трафіку)
+- Shimmer (`shimmer`) для плавного UX завантаження
+- Оптимізована мережа через `dio` (таймаути, інтерсептори)
+
+## 🔒 Security Measures
+
+- Зберігання токенів у `flutter_secure_storage`
+- Обфускація релізних збірок (`--obfuscate --split-debug-info`)
+- Firebase Auth для керування доступом
+
+---
