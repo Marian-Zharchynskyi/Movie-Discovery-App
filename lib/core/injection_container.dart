@@ -59,13 +59,10 @@ Future<void> init() async {
   
   //! Features - will be added in next steps
   await _initAuthFeature();
-  // await _initMoviesFeature();
-  // await _initFavoritesFeature();
   await _initProfileFeature();
 }
 
 Future<void> _initExternalDependencies() async {
-  // Register environment variables
   await dotenv.load(fileName: ".env");
 
   // Register SharedPreferences
@@ -85,6 +82,40 @@ Future<void> _initExternalDependencies() async {
   // Secure Storage
   sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
   
+  // Drift database
+  sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
+  
+  // Register Dio with interceptors
+  sl.registerLazySingleton<Dio>(() {
+     return DioConfig.createDio(
+      baseUrl: dotenv.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3',
+      apiKey: dotenv.env['TMDB_API_KEY'],
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      enableLogging: false,
+      maxRetries: 3,
+    );
+  });
+  
+  // Register data sources
+  sl.registerLazySingleton<MovieRemoteDataSource>(
+    () => MovieRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<MovieLocalDataSource>(
+    () => MovieLocalDataSourceImpl(db: sl()),
+  );
+  sl.registerLazySingleton<FavoritesLocalDataSource>(
+    () => FavoritesLocalDataSourceImpl(db: sl()),
+  );
+  
+  // Register repositories
+  sl.registerLazySingleton<MovieRepository>(
+    () => MovieRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+  );
+  sl.registerLazySingleton<FavoritesRepository>(
+    () => FavoritesRepositoryImpl(localDataSource: sl()),
+  );
+  
   // Register use cases
   sl.registerFactory(() => GetPopularMovies(sl()));
   sl.registerFactory(() => GetTopRatedMovies(sl()));
@@ -98,40 +129,6 @@ Future<void> _initExternalDependencies() async {
   sl.registerFactory(() => RemoveFromFavorites(sl()));
   sl.registerFactory(() => IsFavorite(sl()));
   sl.registerFactory(() => GetFavoritesCount(sl()));
-  
-  // Register repositories
-  sl.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
-  );
-  sl.registerLazySingleton<FavoritesRepository>(
-    () => FavoritesRepositoryImpl(localDataSource: sl()),
-  );
-  
-  // Register data sources
-  sl.registerLazySingleton<MovieRemoteDataSource>(
-    () => MovieRemoteDataSourceImpl(client: sl()),
-  );
-  sl.registerLazySingleton<MovieLocalDataSource>(
-    () => MovieLocalDataSourceImpl(db: sl()),
-  );
-  sl.registerLazySingleton<FavoritesLocalDataSource>(
-    () => FavoritesLocalDataSourceImpl(db: sl()),
-  );
-  
-  // Register Dio with interceptors
-  sl.registerLazySingleton<Dio>(() {
-     return DioConfig.createDio(
-      baseUrl: dotenv.env['TMDB_BASE_URL']!,
-      apiKey: dotenv.env['TMDB_API_KEY'],
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      enableLogging: true,
-      maxRetries: 3,
-    );
-  });
-
-  // Drift database
-  sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
 }
 
 Future<void> _initAuthFeature() async {

@@ -46,3 +46,38 @@ app.*.map.json
 
 # Environment variables
 .env
+
+# Local development files
+.localenv
+
+# VS Code settings
+.vscode/
+!vscode/settings.json
+!vscode/launch.json
+!vscode/extensions.json
+
+# Flutter web generated files
+.web_*
+
+# Flutter/Dart pub
+.packages
+.pub-cache/
+.pub/
+
+# Flutter coverage
+coverage/
+
+# Android Studio
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.Trash-*
