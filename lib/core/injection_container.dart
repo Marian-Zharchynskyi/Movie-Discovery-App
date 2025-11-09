@@ -31,6 +31,8 @@ import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_fr
 import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favorites_count.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/local/movie_local_data_source.dart';
+import 'package:movie_discovery_app/features/movies/data/datasources/local/review_local_data_source.dart';
+import 'package:movie_discovery_app/features/movies/data/datasources/local/video_local_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/repositories/movie_repository_impl.dart';
 import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
@@ -104,13 +106,24 @@ Future<void> _initExternalDependencies() async {
   sl.registerLazySingleton<MovieLocalDataSource>(
     () => MovieLocalDataSourceImpl(db: sl()),
   );
+  sl.registerLazySingleton<ReviewLocalDataSource>(
+    () => ReviewLocalDataSourceImpl(),
+  );
+  sl.registerLazySingleton<VideoLocalDataSource>(
+    () => VideoLocalDataSourceImpl(),
+  );
   sl.registerLazySingleton<FavoritesLocalDataSource>(
     () => FavoritesLocalDataSourceImpl(db: sl()),
   );
   
   // Register repositories
   sl.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+    () => MovieRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      reviewLocalDataSource: sl(),
+      videoLocalDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepositoryImpl(localDataSource: sl()),
