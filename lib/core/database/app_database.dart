@@ -44,6 +44,9 @@ class Favorites extends Table {
 @DriftDatabase(tables: [Movies, Favorites])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
+  // Testing constructors
+  AppDatabase.forTesting(super.e);
+  factory AppDatabase.memory() => AppDatabase.forTesting(NativeDatabase.memory());
 
   @override
   int get schemaVersion => 1;

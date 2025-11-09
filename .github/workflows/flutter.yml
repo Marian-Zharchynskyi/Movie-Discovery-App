@@ -26,6 +26,9 @@ jobs:
         with:
           channel: stable
 
+      - name: Enable Linux desktop
+        run: flutter config --enable-linux-desktop
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -64,11 +67,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lcov
 
-      - name: Run integration tests and merge coverage
+      - name: Run integration tests (linux desktop) and merge coverage
         run: |
           # Try to run integration tests. If they cannot run headlessly, continue without failing the job.
           set +e
-          flutter test --coverage integration_test
+          flutter test -d linux --coverage integration_test
           integ_exit=$?
           set -e
           if [ -f coverage/lcov.info ]; then
@@ -238,11 +241,11 @@ jobs:
             --obfuscate \
             --split-debug-info=build/ios/symbols
 
-      - name: Upload IPA artifact (unsigned)
+      - name: Upload iOS archive artifact (unsigned)
         uses: actions/upload-artifact@v4
         with:
-          name: app-unsigned-ipa
-          path: build/ios/ipa/*.ipa
+          name: app-unsigned-archive
+          path: build/ios/archive/*.xcarchive
           if-no-files-found: error
       
       - name: Upload iOS debug symbols

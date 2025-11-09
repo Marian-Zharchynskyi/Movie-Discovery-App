@@ -3,14 +3,7 @@ import 'package:movie_discovery_app/features/profile/presentation/screens/accoun
 
 void main() {
   group('AccountScreen', () {
-    testWidgets('should display user information when user is available', (tester) async {
-      // This test verifies the AccountScreen widget structure
-      // Full integration testing is done in integration_test folder
-      expect(true, true);
-    });
-
-    testWidgets('should have AccountScreen widget', (tester) async {
-      // Widget structure test
+    testWidgets('placeholder test to ensure file is included in coverage', (tester) async {
       expect(AccountScreen, isNotNull);
     });
   });
