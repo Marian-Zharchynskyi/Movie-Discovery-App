@@ -18,7 +18,6 @@ Movie Discovery
 
 - TMDB API via `dio` (API key через `.env` з `flutter_dotenv`)
 - Firebase Auth (`firebase_auth`, `firebase_core`)
-- Firestore (`cloud_firestore`) для користувацьких даних (наприклад, вподобання)
 - Offline-first: `drift` (SQLite) + `hive`/`shared_preferences` + `cached_network_image`
 - Error handling: `dartz` (`Either`) + інтерсептори в `lib/core/network/dio_config.dart`
 
