@@ -63,7 +63,7 @@ void main() {
       ),
     );
 
-    await tester.pump();
+    await tester.pumpAndSettle();
     // After initial fetch, body should not be empty
     expect(find.byType(GridView), findsOneWidget);
   });

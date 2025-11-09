@@ -73,6 +73,7 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
     // Name, Email, Password, Confirm Password
     expect(find.byType(TextFormField), findsNWidgets(4));

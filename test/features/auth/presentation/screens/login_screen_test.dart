@@ -73,6 +73,7 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
     expect(find.byType(TextFormField), findsNWidgets(2));
     expect(find.byType(FilledButton), findsOneWidget);

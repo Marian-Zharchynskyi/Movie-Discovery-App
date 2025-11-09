@@ -50,8 +50,11 @@ class FakeMovieRepository implements MovieRepository {
 void main() {
   testWidgets('SearchScreen shows hint before query', (tester) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
+      ProviderScope(
+        overrides: [
+          searchMoviesUseCaseProvider.overrideWith((ref) => SearchMovies(FakeMovieRepository())),
+        ],
+        child: const MaterialApp(
           localizationsDelegates: [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -63,6 +66,7 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
     expect(find.byType(TextField), findsOneWidget);
   });
 
@@ -84,11 +88,14 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
     // enter text and submit
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
     await tester.enterText(find.byType(TextField), 'matrix');
     await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Result 1'), findsOneWidget);
   });
@@ -111,10 +118,13 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
     await tester.enterText(find.byType(TextField), 'error');
     await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.error_outline), findsOneWidget);
     expect(find.textContaining('Retry'), findsOneWidget);

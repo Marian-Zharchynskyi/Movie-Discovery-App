@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/local/video_local_data_source.dart';
@@ -5,9 +6,18 @@ import 'package:movie_discovery_app/features/movies/data/models/video_model.dart
 
 void main() {
   late VideoLocalDataSourceImpl dataSource;
+  late Directory tempDir;
 
   setUpAll(() async {
-    await Hive.initFlutter();
+    tempDir = await Directory.systemTemp.createTemp('hive_test_');
+    Hive.init(tempDir.path);
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    if (await tempDir.exists()) {
+      await tempDir.delete(recursive: true);
+    }
   });
 
   setUp(() {

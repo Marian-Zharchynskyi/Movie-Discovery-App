@@ -8,6 +8,8 @@ import 'package:movie_discovery_app/features/movies/presentation/providers/movie
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_reviews_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/movie_videos_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/screens/movie_details_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 void main() {
   const tMovie = MovieEntity(
@@ -51,11 +53,23 @@ void main() {
           movieReviewsProvider.overrideWith((ref, id) async => reviews),
         ],
         child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           home: MovieDetailsScreen(movie: tMovie),
         ),
       ),
     );
 
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump();
     await tester.pump();
 
     expect(find.text('Test Movie'), findsWidgets);
@@ -71,11 +85,20 @@ void main() {
           movieReviewsProvider.overrideWith((ref, id) async => <ReviewEntity>[]),
         ],
         child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           home: MovieDetailsScreen(movie: tMovie),
         ),
       ),
     );
 
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump();
     await tester.pump();
 
     expect(find.byIcon(Icons.error_outline), findsOneWidget);
