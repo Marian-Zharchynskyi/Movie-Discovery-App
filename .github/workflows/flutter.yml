@@ -51,13 +51,41 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run tests with coverage
-        run: flutter test --coverage
+      - name: Run unit/widget tests with coverage
+        run: |
+          flutter test --coverage test || exit 1
+          # Save unit coverage file
+          if [ -f coverage/lcov.info ]; then
+            mv coverage/lcov.info coverage/lcov_unit.info
+          fi
 
       - name: Install lcov
         run: |
           sudo apt-get update
           sudo apt-get install -y lcov
+
+      - name: Run integration tests and merge coverage
+        run: |
+          # Try to run integration tests. If they cannot run headlessly, continue without failing the job.
+          set +e
+          flutter test --coverage integration_test
+          integ_exit=$?
+          set -e
+          if [ -f coverage/lcov.info ]; then
+            mv coverage/lcov.info coverage/lcov_integration.info
+          fi
+
+          # If unit coverage exists and integration coverage exists, merge; otherwise, rename the one that exists to lcov.info
+          if [ -f coverage/lcov_unit.info ] && [ -f coverage/lcov_integration.info ]; then
+            echo "Merging unit and integration coverage..."
+            lcov -a coverage/lcov_unit.info -a coverage/lcov_integration.info -o coverage/lcov.info --ignore-errors unused
+          elif [ -f coverage/lcov_unit.info ]; then
+            mv coverage/lcov_unit.info coverage/lcov.info
+          elif [ -f coverage/lcov_integration.info ]; then
+            mv coverage/lcov_integration.info coverage/lcov.info
+          else
+            echo "No coverage data found" && exit 1
+          fi
 
       - name: Filter coverage data
         run: |
@@ -202,19 +230,13 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build obfuscated iOS archive
+      - name: Build unsigned IPA (obfuscated)
         run: |
-          flutter build ios \
+          flutter build ipa \
             --release \
             --no-codesign \
             --obfuscate \
             --split-debug-info=build/ios/symbols
-
-      - name: Create IPA from archive
-        run: |
-          mkdir -p build/ios/ipa
-          cd build/ios/archive/Runner.xcarchive/Products/Applications
-          zip -r ../../../../../ipa/app-unsigned.ipa Runner.app
 
       - name: Upload IPA artifact (unsigned)
         uses: actions/upload-artifact@v4
