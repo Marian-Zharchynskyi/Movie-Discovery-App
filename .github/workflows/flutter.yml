@@ -67,9 +67,14 @@ jobs:
             lcov --remove coverage/lcov.info \
               '**/*.g.dart' \
               '**/*.freezed.dart' \
+              '**/*.mocks.dart' \
+              '**/*.gen.dart' \
+              '**/*.pb.dart' \
+              '**/*.config.dart' \
               '**/main.dart' \
               '**/injection_container.dart' \
-              -o coverage/lcov_filtered.info
+              -o coverage/lcov_filtered.info \
+              --ignore-errors unused
             
             # Use filtered file
             mv coverage/lcov_filtered.info coverage/lcov.info
