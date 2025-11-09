@@ -5,7 +5,6 @@ import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity
 import 'package:movie_discovery_app/features/movies/presentation/screens/movie_details_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
-import 'package:movie_discovery_app/shared/widgets/shimmers/image_shimmer.dart';
 
 class FavoriteMovieItem extends ConsumerWidget {
   final FavoriteMovieEntity movie;
@@ -83,9 +82,10 @@ class FavoriteMovieItem extends ConsumerWidget {
                       width: 80,
                       height: 120,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => const ImageShimmer(
+                      placeholder: (context, url) => Container(
                         width: 80,
                         height: 120,
+                        color: Colors.grey[300],
                       ),
                       errorWidget: (context, url, error) => Container(
                         width: 80,

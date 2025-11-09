@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Drift-specific options. For example, you can disable two_step_analysis:
+          # two_step_analysis: false
+        generate_for:
+          - lib/core/database/app_database.dart
+      mockito:mockBuilder:
+        options:
+          # Mockito-specific options
+        generate_for:
+          - test/**_test.dart

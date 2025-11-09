@@ -62,10 +62,18 @@ jobs:
             mv coverage/lcov.info coverage/lcov_unit.info
           fi
 
-      - name: Install lcov
+      - name: Install Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y lcov
+          sudo apt-get install -y \
+            lcov \
+            clang \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libgtk-3-dev \
+            liblzma-dev \
+            libstdc++-12-dev
 
       - name: Run integration tests (linux desktop) and merge coverage
         run: |
