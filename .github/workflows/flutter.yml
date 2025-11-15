@@ -76,12 +76,11 @@ jobs:
             liblzma-dev \
             libstdc++-12-dev
 
-      - name: Run integration tests (linux desktop) and merge coverage
+      - name: Run integration tests and merge coverage
         run: |
-          # Try to run integration tests. If they cannot run headlessly, continue without failing the job.
+          # Try to run integration tests in headless mode. If they fail, continue without failing the job.
           set +e
-          flutter test -d linux --coverage integration_test
-          integ_exit=$?
+          flutter test --coverage integration_test
           set -e
           if [ -f coverage/lcov.info ]; then
             mv coverage/lcov.info coverage/lcov_integration.info
