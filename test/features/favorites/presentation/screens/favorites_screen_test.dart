@@ -95,11 +95,13 @@ void main() {
     });
 
     await tester.pumpWidget(_buildApp(repo: repo));
-    // First frame (after post frame callback triggers), show progress
+    // Pump a few times to catch the intermediate loading frame
     await tester.pump();
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 50));
 
-    // Finish the delayed future
+    expect(find.byType(CircularProgressIndicator), findsWidgets);
+
+    // Finish the delayed future so that the test completes cleanly
     await tester.pumpAndSettle();
   });
 

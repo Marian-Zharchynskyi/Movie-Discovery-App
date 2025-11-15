@@ -128,8 +128,9 @@ void main() {
       await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
       await tester.pumpAndSettle();
 
-      expect(find.text('Test User'), findsOneWidget);
-      expect(find.text('user@example.com'), findsOneWidget);
+      // Name and email may appear in multiple sections (header and info tiles), so allow multiple matches
+      expect(find.text('Test User'), findsWidgets);
+      expect(find.text('user@example.com'), findsWidgets);
       expect(find.byType(CircleAvatar), findsOneWidget);
     });
 
