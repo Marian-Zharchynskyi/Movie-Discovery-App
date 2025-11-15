@@ -168,6 +168,9 @@ void main() {
 
       await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
       await tester.pumpAndSettle();
+      // Scroll down so that the preferences section is visible
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -400));
+      await tester.pumpAndSettle();
 
       // Tap on the theme ListTile (leading icon depends on current themeMode; start with system -> brightness_auto)
       await tester.tap(find.byIcon(Icons.brightness_auto));
@@ -191,6 +194,9 @@ void main() {
 
       await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
       await tester.pumpAndSettle();
+      // Scroll down so that the preferences section is visible
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -400));
+      await tester.pumpAndSettle();
 
       // Tap on the language ListTile
       await tester.tap(find.byIcon(Icons.language));
@@ -212,6 +218,9 @@ void main() {
       );
 
       await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+      // Scroll down so that the settings section is fully visible
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -600));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.edit));
@@ -235,6 +244,9 @@ void main() {
 
       await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
       await tester.pumpAndSettle();
+      // Scroll down so that the settings section is fully visible
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -600));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.lock));
       await tester.pump();
@@ -256,6 +268,9 @@ void main() {
       );
 
       await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+      // Scroll down so that the settings section is fully visible
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -600));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.notifications));
