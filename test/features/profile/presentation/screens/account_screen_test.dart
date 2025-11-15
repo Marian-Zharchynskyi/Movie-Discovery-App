@@ -152,5 +152,117 @@ void main() {
       // Admin tile uses supervisor_account icon
       expect(find.byIcon(Icons.supervisor_account), findsOneWidget);
     });
+
+    testWidgets('opens theme dialog when theme tile is tapped', (tester) async {
+      final prefs = MockUserPreferences();
+      when(() => prefs.getThemeModeString()).thenReturn('system');
+      when(() => prefs.getLocaleCode()).thenReturn('en');
+      when(() => prefs.setThemeModeString(any())).thenAnswer((_) async {});
+
+      const user = UserEntity(
+        id: 'u2',
+        email: 'user2@example.com',
+        displayName: 'Theme User',
+        role: 'User',
+      );
+
+      await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+
+      // Tap on the theme ListTile (leading icon depends on current themeMode; start with system -> brightness_auto)
+      await tester.tap(find.byIcon(Icons.brightness_auto));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
+    testWidgets('opens language dialog when language tile is tapped', (tester) async {
+      final prefs = MockUserPreferences();
+      when(() => prefs.getThemeModeString()).thenReturn('system');
+      when(() => prefs.getLocaleCode()).thenReturn('en');
+      when(() => prefs.setLocaleCode(any())).thenAnswer((_) async {});
+
+      const user = UserEntity(
+        id: 'u3',
+        email: 'user3@example.com',
+        displayName: 'Lang User',
+        role: 'User',
+      );
+
+      await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+
+      // Tap on the language ListTile
+      await tester.tap(find.byIcon(Icons.language));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
+    testWidgets('shows snackBar when edit profile is tapped', (tester) async {
+      final prefs = MockUserPreferences();
+      when(() => prefs.getThemeModeString()).thenReturn('system');
+      when(() => prefs.getLocaleCode()).thenReturn('en');
+
+      const user = UserEntity(
+        id: 'u4',
+        email: 'user4@example.com',
+        displayName: 'Edit User',
+        role: 'User',
+      );
+
+      await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.byType(SnackBar), findsWidgets);
+    });
+
+    testWidgets('shows snackBar when change password is tapped', (tester) async {
+      final prefs = MockUserPreferences();
+      when(() => prefs.getThemeModeString()).thenReturn('system');
+      when(() => prefs.getLocaleCode()).thenReturn('en');
+
+      const user = UserEntity(
+        id: 'u5',
+        email: 'user5@example.com',
+        displayName: 'Password User',
+        role: 'User',
+      );
+
+      await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.lock));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.byType(SnackBar), findsWidgets);
+    });
+
+    testWidgets('shows snackBar when notifications is tapped', (tester) async {
+      final prefs = MockUserPreferences();
+      when(() => prefs.getThemeModeString()).thenReturn('system');
+      when(() => prefs.getLocaleCode()).thenReturn('en');
+
+      const user = UserEntity(
+        id: 'u6',
+        email: 'user6@example.com',
+        displayName: 'Notif User',
+        role: 'User',
+      );
+
+      await tester.pumpWidget(_buildApp(user: user, prefs: prefs));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.notifications));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.byType(SnackBar), findsWidgets);
+    });
   });
 }
