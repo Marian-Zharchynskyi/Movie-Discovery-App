@@ -50,7 +50,6 @@ class MovieState {
   }
 }
 
-/// Fetch movie details by ID. Exposes AsyncValue state (loading/error/data).
 final movieDetailsProvider = FutureProvider.family<MovieEntity, int>((ref, movieId) async {
   final getMovieDetails = ref.watch(getMovieDetailsProvider);
   final result = await getMovieDetails(movieId);
@@ -95,7 +94,6 @@ class MovieNotifier extends StateNotifier<MovieState> {
   }
 
   Future<void> loadMoreMovies() async {
-    // Prevent multiple simultaneous loads
     if (state.isLoadingMore || !state.hasMorePages) return;
 
     state = state.copyWith(isLoadingMore: true);

@@ -29,7 +29,6 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
       
-      // Generate app-level JWT for the Firebase user and store it securely
       final jwt = mockAuthApi.createJwtForFirebaseUser(
         userId: user.id,
         email: user.email,
@@ -58,7 +57,6 @@ class AuthRepositoryImpl implements AuthRepository {
         displayName: displayName,
       );
       
-      // Generate app-level JWT for the Firebase user and store it securely
       final jwt = mockAuthApi.createJwtForFirebaseUser(
         userId: user.id,
         email: user.email,

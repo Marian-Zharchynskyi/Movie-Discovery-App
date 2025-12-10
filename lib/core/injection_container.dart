@@ -31,6 +31,8 @@ import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_fr
 import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favorites_count.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/remote/movie_remote_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/datasources/local/movie_local_data_source.dart';
+import 'package:movie_discovery_app/features/movies/data/datasources/local/review_local_data_source.dart';
+import 'package:movie_discovery_app/features/movies/data/datasources/local/video_local_data_source.dart';
 import 'package:movie_discovery_app/features/movies/data/repositories/movie_repository_impl.dart';
 import 'package:movie_discovery_app/features/movies/domain/repositories/movie_repository.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/get_popular_movies.dart';
@@ -41,7 +43,6 @@ import 'package:movie_discovery_app/features/movies/domain/usecases/get_movie_re
 import 'package:movie_discovery_app/features/movies/domain/usecases/discover_movies.dart';
 import 'package:movie_discovery_app/features/movies/domain/usecases/search_movies.dart';
 
-// Profile feature
 import 'package:movie_discovery_app/features/profile/data/datasources/profile_local_data_source.dart';
 import 'package:movie_discovery_app/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:movie_discovery_app/features/profile/domain/repositories/profile_repository.dart';
@@ -54,10 +55,7 @@ import 'package:movie_discovery_app/features/profile/domain/usecases/set_locale_
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  //! External
   await _initExternalDependencies();
-  
-  //! Features - will be added in next steps
   await _initAuthFeature();
   await _initProfileFeature();
 }
@@ -65,27 +63,20 @@ Future<void> init() async {
 Future<void> _initExternalDependencies() async {
   await dotenv.load(fileName: ".env");
 
-  // Register SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
-  // Hive for user preferences
   await Hive.initFlutter();
   final userPrefsBox = await Hive.openBox(UserPreferences.boxName);
   sl.registerLazySingleton<UserPreferences>(() => UserPreferences(userPrefsBox));
   
-  // FirebaseAuth
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-  // FirebaseFirestore
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   
-  // Secure Storage
   sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
   
-  // Drift database
   sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
   
-  // Register Dio with interceptors
   sl.registerLazySingleton<Dio>(() {
      return DioConfig.createDio(
       baseUrl: dotenv.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3',
@@ -97,26 +88,34 @@ Future<void> _initExternalDependencies() async {
     );
   });
   
-  // Register data sources
   sl.registerLazySingleton<MovieRemoteDataSource>(
     () => MovieRemoteDataSourceImpl(client: sl()),
   );
   sl.registerLazySingleton<MovieLocalDataSource>(
     () => MovieLocalDataSourceImpl(db: sl()),
   );
+  sl.registerLazySingleton<ReviewLocalDataSource>(
+    () => ReviewLocalDataSourceImpl(),
+  );
+  sl.registerLazySingleton<VideoLocalDataSource>(
+    () => VideoLocalDataSourceImpl(),
+  );
   sl.registerLazySingleton<FavoritesLocalDataSource>(
     () => FavoritesLocalDataSourceImpl(db: sl()),
   );
   
-  // Register repositories
   sl.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+    () => MovieRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      reviewLocalDataSource: sl(),
+      videoLocalDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepositoryImpl(localDataSource: sl()),
   );
   
-  // Register use cases
   sl.registerFactory(() => GetPopularMovies(sl()));
   sl.registerFactory(() => GetTopRatedMovies(sl()));
   sl.registerFactory(() => GetMovieDetails(sl()));
@@ -132,11 +131,8 @@ Future<void> _initExternalDependencies() async {
 }
 
 Future<void> _initAuthFeature() async {
-  // Mock Auth API (optional - can switch between Firebase and Mock)
   sl.registerLazySingleton<MockAuthApi>(() => MockAuthApi());
   
-  // Data sources
-  // Use Firebase implementation as the primary auth provider
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(firebaseAuth: sl(), firestore: sl()),
   );
@@ -145,7 +141,6 @@ Future<void> _initAuthFeature() async {
     () => AuthLocalDataSourceImpl(secureStorage: sl()),
   );
 
-  // Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
       remoteDataSource: sl(),
@@ -154,7 +149,6 @@ Future<void> _initAuthFeature() async {
     ),
   );
 
-  // Use cases
   sl.registerFactory(() => SignIn(sl()));
   sl.registerFactory(() => SignUp(sl()));
   sl.registerFactory(() => SignOut(sl()));
@@ -163,12 +157,10 @@ Future<void> _initAuthFeature() async {
 }
 
 Future<void> _initProfileFeature() async {
-  // Data source
   sl.registerLazySingleton<ProfileLocalDataSource>(
     () => ProfileLocalDataSourceImpl(prefs: sl()),
   );
 
-  // Repository
   sl.registerLazySingleton<ProfileRepository>(
     () => ProfileRepositoryImpl(
       authRepository: sl(),
@@ -176,7 +168,6 @@ Future<void> _initProfileFeature() async {
     ),
   );
 
-  // Use cases
   sl.registerFactory(() => GetProfile(sl()));
   sl.registerFactory(() => GetThemeMode(sl()));
   sl.registerFactory(() => SetThemeMode(sl()));

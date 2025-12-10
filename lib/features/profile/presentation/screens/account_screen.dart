@@ -44,7 +44,6 @@ class AccountScreen extends ConsumerWidget {
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  // Profile Header
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -53,7 +52,6 @@ class AccountScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        // Avatar
                         CircleAvatar(
                           radius: 50,
                           backgroundColor:
@@ -73,7 +71,6 @@ class AccountScreen extends ConsumerWidget {
                               : null,
                         ),
                         const SizedBox(height: 16),
-                        // Display Name
                         Text(
                           user.displayName ?? 'User',
                           style: Theme.of(context)
@@ -84,7 +81,6 @@ class AccountScreen extends ConsumerWidget {
                               ),
                         ),
                         const SizedBox(height: 8),
-                        // Email
                         Text(
                           user.email,
                           style:
@@ -101,7 +97,6 @@ class AccountScreen extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Account Information Section
                   _buildSection(
                     context,
                     l10n,
@@ -133,13 +128,11 @@ class AccountScreen extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Preferences Section
                   _buildSection(
                     context,
                     l10n,
                     title: l10n.preferences,
                     children: [
-                      // Theme Toggle
                       ListTile(
                         leading: Icon(
                           settings.themeMode == ThemeMode.dark
@@ -161,7 +154,6 @@ class AccountScreen extends ConsumerWidget {
                           _showThemeDialog(context, l10n, settingsNotifier, settings);
                         },
                       ),
-                      // Language Toggle
                       ListTile(
                         leading: const Icon(Icons.language),
                         title: Text(l10n.language),
@@ -180,7 +172,6 @@ class AccountScreen extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Settings Section
                   _buildSection(
                     context,
                     l10n,
@@ -236,7 +227,6 @@ class AccountScreen extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Actions Section
                   _buildSection(
                     context,
                     l10n,
@@ -285,7 +275,6 @@ class AccountScreen extends ConsumerWidget {
 
                   const SizedBox(height: 32),
 
-                  // App Version
                   Text(
                     '${l10n.version} 1.0.0',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

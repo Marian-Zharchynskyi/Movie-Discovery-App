@@ -6,7 +6,6 @@ import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favor
 import 'package:movie_discovery_app/features/favorites/domain/usecases/is_favorite.dart';
 import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_from_favorites.dart';
 
-// Providers
 final getFavoriteMoviesProvider = Provider<GetFavoriteMovies>((ref) {
   return sl<GetFavoriteMovies>();
 });
@@ -23,13 +22,11 @@ final isFavoriteProvider = Provider<IsFavorite>((ref) {
   return sl<IsFavorite>();
 });
 
-// Helper class for nullable values in copyWith
 class _Wrapped<T> {
   final T value;
   const _Wrapped(this.value);
 }
 
-// State
 class FavoritesState {
   final List<FavoriteMovieEntity> favoriteMovies;
   final bool isLoading;
@@ -60,7 +57,6 @@ class FavoritesState {
   }
 }
 
-// State Notifier
 class FavoritesNotifier extends StateNotifier<FavoritesState> {
   final GetFavoriteMovies _getFavoriteMovies;
   final AddToFavorites _addToFavorites;
@@ -78,7 +74,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
         _isFavorite = isFavorite,
         super(const FavoritesState.initial());
 
-  // Load all favorite movies
   Future<void> loadFavoriteMovies() async {
     state = state.copyWith(isLoading: true, error: null);
 

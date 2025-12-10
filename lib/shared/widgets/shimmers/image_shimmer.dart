@@ -17,20 +17,21 @@ class ImageShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseColor = Colors.grey.shade300;
     final highlightColor = Colors.grey.shade100;
+    final effectiveRadius = borderRadius ?? BorderRadius.circular(8);
 
     final box = Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
         color: baseColor,
-        borderRadius: borderRadius,
+        borderRadius: effectiveRadius,
       ),
     );
 
     return Shimmer.fromColors(
       baseColor: baseColor,
       highlightColor: highlightColor,
-      child: borderRadius != null ? ClipRRect(borderRadius: borderRadius!, child: box) : box,
+      child: ClipRRect(borderRadius: effectiveRadius, child: box),
     );
   }
 }

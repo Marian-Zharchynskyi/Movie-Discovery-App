@@ -21,23 +21,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final isLoggingIn = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
 
-      // If not authenticated and trying to access protected routes
       if (!isAuthenticated && !isLoggingIn) {
         return '/login';
       }
 
-      // If authenticated and trying to access login/register
       if (isAuthenticated && isLoggingIn) {
         return '/home';
       }
 
-      // Admin-only protection
       final isAdminRoute = state.matchedLocation.startsWith('/admin');
       if (isAdminRoute && !isAdmin) {
         return '/home';
       }
 
-      // No redirect needed
       return null;
     },
     routes: [
@@ -71,7 +67,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: 'account',
             builder: (context, state) => const AccountScreen(),
           ),
-          // Admin routes
           GoRoute(
             path: '/admin/users',
             name: 'admin_users',
@@ -83,7 +78,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-// Main shell with bottom navigation
 class MainShell extends StatefulWidget {
   final Widget child;
 
@@ -117,7 +111,6 @@ class _MainShellState extends State<MainShell> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Update selected index based on current route
     final location = GoRouterState.of(context).matchedLocation;
     if (location.startsWith('/home')) {
       _selectedIndex = 0;

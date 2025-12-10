@@ -226,7 +226,6 @@ class _FilterSheetState extends State<_FilterSheet> {
                 child: ListView(
                   controller: scrollController,
                   children: [
-                    // Genres
                     Text('Genres', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Wrap(
@@ -251,7 +250,6 @@ class _FilterSheetState extends State<_FilterSheet> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Year
                     Text('Release Year', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<int?>(
@@ -274,7 +272,6 @@ class _FilterSheetState extends State<_FilterSheet> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Rating
                     Text('Minimum Rating', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Row(

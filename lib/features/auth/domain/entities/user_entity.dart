@@ -5,7 +5,7 @@ class UserEntity extends Equatable {
   final String email;
   final String? displayName;
   final String? photoUrl;
-  final String role; // e.g., 'Admin' or 'User'
+  final String role;
 
   const UserEntity({
     required this.id,
