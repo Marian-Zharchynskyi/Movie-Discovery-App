@@ -7,7 +7,6 @@ import 'package:movie_discovery_app/features/auth/domain/usecases/sign_in.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_out.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_up.dart';
 
-// Auth state
 class AuthState {
   final UserEntity? user;
   final bool isLoading;
@@ -36,7 +35,6 @@ class AuthState {
   }
 }
 
-// Auth notifier
 class AuthNotifier extends StateNotifier<AuthState> {
   final SignIn signIn;
   final SignUp signUp;
@@ -55,7 +53,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void _init() {
-    // Listen to auth state changes
     authRepository.authStateChanges.listen((user) {
       state = state.copyWith(
         user: user,
@@ -64,7 +61,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     });
 
-    // Check current user
     checkAuthStatus();
   }
 
@@ -171,7 +167,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-// Provider
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(
     signIn: sl<SignIn>(),

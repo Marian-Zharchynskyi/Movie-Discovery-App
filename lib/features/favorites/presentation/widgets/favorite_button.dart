@@ -76,7 +76,6 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
           }
         }
       } else {
-        // Convert MovieEntity to FavoriteMovieEntity
         final favoriteMovie = FavoriteMovieEntity(
           id: widget.movie.id,
           title: widget.movie.title,

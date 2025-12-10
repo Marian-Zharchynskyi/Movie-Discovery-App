@@ -3,12 +3,10 @@ import 'package:movie_discovery_app/core/injection_container.dart';
 import 'package:movie_discovery_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:movie_discovery_app/features/profile/domain/usecases/get_profile.dart';
 
-// Provider for GetProfile use case
 final getProfileProvider = Provider<GetProfile>((ref) {
   return sl<GetProfile>();
 });
 
-// State for profile
 class ProfileState {
   final ProfileEntity? profile;
   final bool isLoading;
@@ -35,7 +33,6 @@ class ProfileState {
   }
 }
 
-// Profile Notifier
 class ProfileNotifier extends StateNotifier<ProfileState> {
   final GetProfile _getProfile;
 
@@ -78,7 +75,6 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   }
 }
 
-// Profile Provider
 final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
   return ProfileNotifier(
     getProfile: ref.watch(getProfileProvider),

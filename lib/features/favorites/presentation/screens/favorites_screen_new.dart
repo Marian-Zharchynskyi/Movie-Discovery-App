@@ -14,7 +14,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback to safely access ref after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadFavorites();
     });

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RatingStars extends StatelessWidget {
-  final double rating10; // 0-10 scale
+  final double rating10;
   final double size;
   final Color color;
 
@@ -14,7 +14,6 @@ class RatingStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Convert 0-10 to 0-5 scale
     final rating5 = (rating10 / 2).clamp(0, 5);
     final fullStars = rating5.floor();
     final hasHalf = (rating5 - fullStars) >= 0.5;

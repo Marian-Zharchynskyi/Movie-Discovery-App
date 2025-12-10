@@ -46,7 +46,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw ServerException('Failed to sign in');
       }
 
-      // Fetch role from Firestore (default 'User' if missing)
       final uid = userCredential.user!.uid;
       final role = await _getUserRole(uid);
       return UserModel.fromFirebaseUser(userCredential.user!, role: role);
@@ -73,7 +72,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw ServerException('Failed to create account');
       }
 
-      // Update display name if provided
       if (displayName != null && displayName.isNotEmpty) {
         await userCredential.user!.updateDisplayName(displayName);
         await userCredential.user!.reload();
@@ -84,7 +82,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw ServerException('Failed to get user data');
       }
 
-      // Ensure user document exists with default role 'User'
       await _ensureUserDocument(
         updatedUser.uid,
         displayName: displayName,
@@ -190,7 +187,6 @@ extension on AuthRemoteDataSourceImpl {
   }
 }
 
-/// Mock API implementation with JWT tokens
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
   final MockAuthApi mockAuthApi;
   String? _currentToken;
@@ -275,7 +271,6 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
 
   @override
   Stream<UserModel?> get authStateChanges {
-    // For mock implementation, return a simple stream
     return Stream.value(_currentUser);
   }
 

@@ -15,9 +15,7 @@ class Movies extends Table {
   TextColumn get backdropPath => text().nullable()();
   RealColumn get voteAverage => real()();
   TextColumn get releaseDate => text().withDefault(const Constant(''))();
-  // Store genreIds as a JSON string to keep schema simple
   TextColumn get genreIdsJson => text().withDefault(const Constant('[]'))();
-  // Category to distinguish lists like popular / top_rated
   TextColumn get category => text().withDefault(const Constant(''))();
   DateTimeColumn get cachedAt => dateTime().withDefault(currentDateAndTime)();
 
@@ -25,7 +23,6 @@ class Movies extends Table {
   Set<Column> get primaryKey => {id, category};
 }
 
-// Separate table for user favorites, includes dateAdded
 class Favorites extends Table {
   IntColumn get id => integer()();
   TextColumn get title => text()();
@@ -44,7 +41,6 @@ class Favorites extends Table {
 @DriftDatabase(tables: [Movies, Favorites])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
-  // Testing constructors
   AppDatabase.forTesting(super.e);
   factory AppDatabase.memory() => AppDatabase.forTesting(NativeDatabase.memory());
 
@@ -77,7 +73,6 @@ class AppDatabase extends _$AppDatabase {
         .toList();
   }
 
-  // Movies
   Future<MovieRow?> getMovieById(int id) async {
     try {
       final q = select(movies)..where((t) => t.id.equals(id));
@@ -100,7 +95,6 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  // Favorites
   Future<void> addToFavorites(FavoritesCompanion favorite) async {
     try {
       await into(favorites).insert(favorite, mode: InsertMode.replace);
@@ -159,7 +153,6 @@ class AppDatabase extends _$AppDatabase {
         .toList();
   }
 
-  // Favorites API
   Future<void> upsertFavorite(FavoritesCompanion entry) async {
     await into(favorites).insertOnConflictUpdate(entry);
   }
@@ -193,7 +186,6 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-// Simple POJO row to keep mapping logic outside of generated classes
 class FavoriteRow {
   final int id;
   final String title;

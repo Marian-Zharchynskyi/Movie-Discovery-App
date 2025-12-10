@@ -10,26 +10,20 @@ import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   try {
-    // Initialize Flutter bindings
     WidgetsFlutterBinding.ensureInitialized();
     
-    // Initialize Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // Initialize dependency injection
     await di.init();
 
-    // Run the app
     runApp(
       const ProviderScope(
         child: MovieDiscoveryApp(),
       ),
     );
   } catch (e) {
-    
-    // Show error UI if initialization fails
     runApp(
       const MaterialApp(
         home: Scaffold(

@@ -24,18 +24,10 @@ class DioConfig {
       ),
     );
 
-    // Add interceptors
     dio.interceptors.addAll([
-      // Logging interceptor
       if (enableLogging) _LoggingInterceptor(),
-
-      // Retry interceptor
       _RetryInterceptor(maxRetries: maxRetries),
-
-      // Error handling interceptor
       _ErrorInterceptor(),
-
-      // Add API key as query parameter if provided
       if (apiKey != null) _ApiKeyInterceptor(apiKey),
     ]);
 
@@ -43,7 +35,6 @@ class DioConfig {
   }
 }
 
-/// Logging interceptor for requests and responses
 class _LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -78,7 +69,6 @@ class _LoggingInterceptor extends Interceptor {
   }
 }
 
-/// Retry interceptor for handling transient failures
 class _RetryInterceptor extends Interceptor {
   final int maxRetries;
 
@@ -86,7 +76,6 @@ class _RetryInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // Only retry on specific errors
     if (_shouldRetry(err) && err.requestOptions.extra['retries'] != null) {
       final retries = (err.requestOptions.extra['retries'] as int) + 1;
 
@@ -95,14 +84,11 @@ class _RetryInterceptor extends Interceptor {
           print('🔄 [DIO] Retrying request ($retries/$maxRetries): ${err.requestOptions.uri}');
         }
 
-        // Update retry count
         err.requestOptions.extra['retries'] = retries;
 
-        // Add delay before retry (exponential backoff)
         await Future.delayed(Duration(milliseconds: (1 << retries) * 1000));
 
         try {
-          // Retry the request
           final response = await Dio().fetch(err.requestOptions);
           handler.resolve(response);
           return;
@@ -121,14 +107,13 @@ class _RetryInterceptor extends Interceptor {
     return err.type == DioExceptionType.connectionTimeout ||
            err.type == DioExceptionType.sendTimeout ||
            err.type == DioExceptionType.receiveTimeout ||
-           (err.response?.statusCode == 429) || // Too Many Requests
-           (err.response?.statusCode == 503) || // Service Unavailable
-           (err.response?.statusCode == 502) || // Bad Gateway
-           (err.response?.statusCode == 500);   // Internal Server Error
+           (err.response?.statusCode == 429) ||
+           (err.response?.statusCode == 503) ||
+           (err.response?.statusCode == 502) ||
+           (err.response?.statusCode == 500);
   }
 }
 
-/// Error interceptor for handling HTTP errors and converting them to custom exceptions
 class _ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
@@ -193,7 +178,6 @@ class _ErrorInterceptor extends Interceptor {
   }
 }
 
-/// API Key interceptor to add API key as query parameter
 class _ApiKeyInterceptor extends Interceptor {
   final String apiKey;
 

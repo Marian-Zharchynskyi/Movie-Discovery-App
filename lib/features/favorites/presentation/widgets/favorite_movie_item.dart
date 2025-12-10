@@ -35,7 +35,7 @@ class FavoriteMovieItem extends ConsumerWidget {
       confirmDismiss: (direction) async {
         if (onRemove != null) {
           onRemove!();
-          return false; // We'll handle the removal in the callback
+          return false;
         }
         return false;
       },
@@ -48,7 +48,6 @@ class FavoriteMovieItem extends ConsumerWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // Convert FavoriteMovieEntity to MovieEntity
             final movieEntity = MovieEntity(
               id: movie.id,
               title: movie.title,
@@ -72,7 +71,6 @@ class FavoriteMovieItem extends ConsumerWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Movie poster
                 Hero(
                   tag: 'moviePoster_${movie.id}',
                   child: ClipRRect(
@@ -97,7 +95,6 @@ class FavoriteMovieItem extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Movie details
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

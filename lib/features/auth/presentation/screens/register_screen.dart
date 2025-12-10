@@ -59,7 +59,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo or Title
                   Icon(
                     Icons.movie,
                     size: 80,
@@ -84,7 +83,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 48),
 
-                  // Name field
                   TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.name,
@@ -104,7 +102,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Email field
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -127,7 +124,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Password field
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -162,7 +158,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Confirm Password field
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
@@ -197,7 +192,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Error message
                   if (authState.error != null)
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -225,7 +219,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                     ),
 
-                  // Register button
                   FilledButton(
                     onPressed: authState.isLoading ? null : _handleRegister,
                     style: FilledButton.styleFrom(
@@ -250,7 +243,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Login link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

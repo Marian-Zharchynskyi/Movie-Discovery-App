@@ -85,7 +85,6 @@ class MovieDetailsShimmer extends StatelessWidget {
                 infoColumn,
               ],
               const SizedBox(height: 24),
-              // Overview title and lines
               line(120, 18),
               const SizedBox(height: 12),
               line(double.infinity, 12),
@@ -94,7 +93,6 @@ class MovieDetailsShimmer extends StatelessWidget {
               const SizedBox(height: 8),
               line(constraints.maxWidth * 0.6, 12),
               const SizedBox(height: 24),
-              // Backdrop placeholder
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Shimmer.fromColors(

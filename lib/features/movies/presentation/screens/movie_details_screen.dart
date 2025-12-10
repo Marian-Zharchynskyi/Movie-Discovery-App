@@ -74,7 +74,6 @@ class MovieDetailsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header: poster + basic info
                     isWide
                         ? Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +94,6 @@ class MovieDetailsScreen extends ConsumerWidget {
 
                     const SizedBox(height: 24.0),
 
-                    // Overview
                     if (m.overview.isNotEmpty) ...[
                       Text(
                         AppLocalizations.of(context).overview,
@@ -105,7 +103,6 @@ class MovieDetailsScreen extends ConsumerWidget {
                       Text(m.overview, style: theme.textTheme.bodyMedium),
                     ],
 
-                    // Backdrop
                     if (m.backdropPath != null) ...[
                       const SizedBox(height: 24.0),
                       ClipRRect(
@@ -121,11 +118,9 @@ class MovieDetailsScreen extends ConsumerWidget {
                       ),
                     ],
 
-                    // Trailers Section
                     const SizedBox(height: 24.0),
                     _TrailersSection(movieId: m.id),
 
-                    // Reviews Section
                     const SizedBox(height: 24.0),
                     _ReviewsSection(movieId: m.id),
                   ],
@@ -339,7 +334,6 @@ class _TrailerCard extends StatelessWidget {
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
 
-    // On web, open in a new tab/window
     if (kIsWeb) {
       await launchUrl(
         uri,
@@ -348,7 +342,6 @@ class _TrailerCard extends StatelessWidget {
       return;
     }
 
-    // Try external application first; if not supported, fall back to default
     final openedExternally = await launchUrl(
       uri,
       mode: LaunchMode.externalApplication,

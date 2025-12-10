@@ -5,9 +5,9 @@ import 'package:movie_discovery_app/features/profile/domain/entities/profile_ent
 abstract class ProfileRepository {
   Future<Either<Failure, ProfileEntity>> getProfile();
 
-  Future<Either<Failure, String?>> getThemeMode(); // light|dark|system
+  Future<Either<Failure, String?>> getThemeMode();
   Future<Either<Failure, void>> setThemeMode(String mode);
 
-  Future<Either<Failure, String?>> getLocaleCode(); // e.g. en|uk|null
+  Future<Either<Failure, String?>> getLocaleCode();
   Future<Either<Failure, void>> setLocaleCode(String? code);
 }
