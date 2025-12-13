@@ -48,7 +48,7 @@ class MovieDiscoveryApp extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     
     return MaterialApp.router(
-      title: 'Movie Discovery',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       locale: settings.locale,
       localizationsDelegates: const [

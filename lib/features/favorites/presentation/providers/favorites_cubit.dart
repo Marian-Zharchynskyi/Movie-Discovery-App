@@ -98,7 +98,7 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'Failed to load favorites: $e',
+        error: e.toString(),
       );
     }
   }
@@ -131,7 +131,7 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'Failed to add to favorites: $e',
+        error: e.toString(),
       );
       return false;
     }
@@ -163,7 +163,7 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'Failed to remove from favorites: $e',
+        error: e.toString(),
       );
       return false;
     }
@@ -180,7 +180,7 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
         (isFavorite) => isFavorite,
       );
     } catch (e) {
-      state = state.copyWith(error: 'Failed to check favorite status: $e');
+      state = state.copyWith(error: e.toString());
       return false;
     }
   }

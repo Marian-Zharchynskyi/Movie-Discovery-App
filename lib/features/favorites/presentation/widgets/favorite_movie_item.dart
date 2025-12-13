@@ -5,6 +5,7 @@ import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity
 import 'package:movie_discovery_app/features/movies/presentation/screens/movie_details_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class FavoriteMovieItem extends ConsumerWidget {
   final FavoriteMovieEntity movie;
@@ -19,9 +20,16 @@ class FavoriteMovieItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final formattedDate = movie.releaseDate.isNotEmpty
-        ? DateFormat('MMM d, y').format(DateTime.parse(movie.releaseDate))
-        : 'N/A';
+    final l10n = AppLocalizations.of(context);
+    final formattedDate = () {
+      if (movie.releaseDate.isEmpty) return l10n.unknown;
+      try {
+        final localeName = Localizations.localeOf(context).toString();
+        return DateFormat.yMMMd(localeName).format(DateTime.parse(movie.releaseDate));
+      } catch (_) {
+        return l10n.unknown;
+      }
+    }();
 
     return Dismissible(
       key: ValueKey('favorite_${movie.id}'),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/features/favorites/domain/entities/favorite_movie_entity.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 class FavoriteButton extends ConsumerStatefulWidget {
   final MovieEntity movie;
@@ -52,7 +53,9 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
       } catch (e) {
         if (mounted) {
           setState(() => _isLoading = false);
-          _showErrorSnackBar('Failed to check favorite status');
+          _showErrorSnackBar(
+            AppLocalizations.of(context).failedToCheckFavoriteStatus,
+          );
         }
       }
     }
@@ -70,9 +73,11 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
         if (mounted) {
           if (success) {
             setState(() => _isFavorite = false);
-            _showSnackBar('Removed from favorites');
+            _showSnackBar(AppLocalizations.of(context).removedFromFavorites);
           } else {
-            _showErrorSnackBar('Failed to remove from favorites');
+            _showErrorSnackBar(
+              AppLocalizations.of(context).failedToRemoveFromFavorites,
+            );
           }
         }
       } else {
@@ -94,9 +99,11 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
         if (mounted) {
           if (success) {
             setState(() => _isFavorite = true);
-            _showSnackBar('Added to favorites');
+            _showSnackBar(AppLocalizations.of(context).addedToFavorites);
           } else {
-            _showErrorSnackBar('Failed to add to favorites');
+            _showErrorSnackBar(
+              AppLocalizations.of(context).failedToAddToFavorites,
+            );
           }
         }
       }
@@ -104,8 +111,8 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
       if (mounted) {
         _showErrorSnackBar(
           _isFavorite
-              ? 'Failed to remove from favorites'
-              : 'Failed to add to favorites',
+              ? AppLocalizations.of(context).failedToRemoveFromFavorites
+              : AppLocalizations.of(context).failedToAddToFavorites,
         );
       }
     } finally {

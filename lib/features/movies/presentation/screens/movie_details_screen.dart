@@ -61,7 +61,9 @@ class MovieDetailsScreen extends ConsumerWidget {
       ),
       data: (movieData) {
         final m = movieData;
-        final releaseYear = m.releaseDate.isNotEmpty ? m.releaseDate.split('-').first : 'N/A';
+        final releaseYear = m.releaseDate.isNotEmpty
+            ? m.releaseDate.split('-').first
+            : AppLocalizations.of(context).unknown;
         return Scaffold(
           appBar: AppBar(
             title: Text(m.title),
@@ -181,6 +183,8 @@ class _BasicInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -205,7 +209,13 @@ class _BasicInfo extends StatelessWidget {
             runSpacing: 4.0,
             children: movie.genreIds.take(3).map((genreId) {
               return Chip(
-                label: Text(GenreModel.getGenreName(genreId)),
+                label: Text(
+                  GenreModel.getGenreName(
+                    genreId,
+                    languageCode: languageCode,
+                    unknownLabel: l10n.unknown,
+                  ),
+                ),
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,

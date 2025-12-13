@@ -1,5 +1,5 @@
 class GenreModel {
-  static const Map<int, String> genres = {
+  static const Map<int, String> genresEn = {
     28: 'Action',
     12: 'Adventure',
     16: 'Animation',
@@ -20,11 +20,52 @@ class GenreModel {
     37: 'Western',
   };
 
-  static String getGenreName(int genreId) {
-    return genres[genreId] ?? 'Unknown';
+  static const Map<int, String> genres = genresEn;
+
+  static const Map<int, String> genresUk = {
+    28: 'Бойовик',
+    12: 'Пригоди',
+    16: 'Анімація',
+    35: 'Комедія',
+    80: 'Кримінал',
+    18: 'Драма',
+    10751: "Сімейний",
+    14: 'Фентезі',
+    36: 'Історія',
+    27: 'Жахи',
+    10402: 'Музика',
+    9648: 'Детектив',
+    10749: 'Романтика',
+    878: 'Наукова фантастика',
+    10770: 'Телефільм',
+    53: 'Трилер',
+    10752: 'Військовий',
+    37: 'Вестерн',
+  };
+
+  static const Map<String, Map<int, String>> _genresByLanguageCode = {
+    'en': genresEn,
+    'uk': genresUk,
+  };
+
+  static Map<int, String> genresFor(String languageCode) {
+    return _genresByLanguageCode[languageCode] ?? genresEn;
   }
 
-  static List<String> getGenreNames(List<int> genreIds) {
-    return genreIds.map((id) => genres[id] ?? 'Unknown').toList();
+  static String getGenreName(
+    int genreId, {
+    String languageCode = 'en',
+    String unknownLabel = 'Unknown',
+  }) {
+    return genresFor(languageCode)[genreId] ?? unknownLabel;
+  }
+
+  static List<String> getGenreNames(
+    List<int> genreIds, {
+    String languageCode = 'en',
+    String unknownLabel = 'Unknown',
+  }) {
+    final genres = genresFor(languageCode);
+    return genreIds.map((id) => genres[id] ?? unknownLabel).toList();
   }
 }

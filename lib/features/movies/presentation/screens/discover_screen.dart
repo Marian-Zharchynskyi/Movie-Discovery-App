@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_discovery_app/features/movies/data/models/genre_model.dart';
 import 'package:movie_discovery_app/features/movies/presentation/providers/discover_movies_provider.dart';
 import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_grid_shimmer.dart';
 import 'package:movie_discovery_app/shared/widgets/shimmers/movie_card_shimmer.dart';
 
@@ -77,10 +78,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(discoverMoviesProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover Movies'),
+        title: Text(l10n.discoverMovies),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -117,14 +119,14 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             const Icon(Icons.error_outline, color: Colors.red, size: 48),
             const SizedBox(height: 16),
             Text(
-              'Error: ${state.errorMessage}',
+              '${AppLocalizations.of(context).error}: ${state.errorMessage}',
               style: const TextStyle(color: Colors.red, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _applyFilters,
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),
@@ -132,7 +134,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     }
 
     if (state.movies.isEmpty) {
-      return const Center(child: Text('No movies found'));
+      return Center(child: Text(AppLocalizations.of(context).noMoviesFound));
     }
 
     return GridView.builder(
@@ -190,6 +192,9 @@ class _FilterSheetState extends State<_FilterSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentYear = DateTime.now().year;
+    final l10n = AppLocalizations.of(context);
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final genres = GenreModel.genresFor(languageCode);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -206,7 +211,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Filters',
+                    l10n.filters,
                     style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   TextButton(
@@ -217,7 +222,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         _minRating = null;
                       });
                     },
-                    child: const Text('Clear All'),
+                    child: Text(l10n.clearAll),
                   ),
                 ],
               ),
@@ -226,12 +231,12 @@ class _FilterSheetState extends State<_FilterSheet> {
                 child: ListView(
                   controller: scrollController,
                   children: [
-                    Text('Genres', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.genres, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8.0,
                       runSpacing: 8.0,
-                      children: GenreModel.genres.entries.map((entry) {
+                      children: genres.entries.map((entry) {
                         final isSelected = _genres.contains(entry.key);
                         return FilterChip(
                           label: Text(entry.value),
@@ -250,7 +255,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     ),
                     const SizedBox(height: 24),
 
-                    Text('Release Year', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.releaseYear, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<int?>(
                       initialValue: _year,
@@ -259,7 +264,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       items: [
-                        const DropdownMenuItem(value: null, child: Text('Any Year')),
+                        DropdownMenuItem(value: null, child: Text(l10n.anyYear)),
                         ...List.generate(50, (i) => currentYear - i).map((year) {
                           return DropdownMenuItem(value: year, child: Text(year.toString()));
                         }),
@@ -272,7 +277,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     ),
                     const SizedBox(height: 24),
 
-                    Text('Minimum Rating', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.minimumRating, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -311,7 +316,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     widget.onApply(_genres, _year, _minRating);
                     Navigator.pop(context);
                   },
-                  child: const Text('Apply Filters'),
+                  child: Text(l10n.applyFilters),
                 ),
               ),
             ],

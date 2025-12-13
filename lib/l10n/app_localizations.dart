@@ -96,6 +96,7 @@ class AppLocalizations {
       'search_for_movies': 'Search for movies',
       'no_movies_found': 'No movies found',
       'discover': 'Discover',
+      'discover_movies': 'Discover Movies',
       'movie_details': 'Movie Details',
       'overview': 'Overview',
       'trailers': 'Trailers',
@@ -105,6 +106,13 @@ class AppLocalizations {
       'add_to_favorites': 'Add to Favorites',
       'remove_from_favorites': 'Remove from Favorites',
       'release_label': 'Release',
+      'filters': 'Filters',
+      'clear_all': 'Clear All',
+      'genres': 'Genres',
+      'release_year': 'Release Year',
+      'any_year': 'Any Year',
+      'minimum_rating': 'Minimum Rating',
+      'apply_filters': 'Apply Filters',
       
       // Profile
       'profile': 'Profile',
@@ -114,9 +122,18 @@ class AppLocalizations {
       'error_loading_favorites': 'Error loading favorites',
       'no_favorites_yet': 'No favorites yet',
       'tap_heart_to_add_favorites': 'Tap the heart icon on any movie to add it to your favorites',
+      'added_to_favorites': 'Added to favorites',
       'removed_from_favorites': 'Removed from favorites',
+      'failed_to_add_to_favorites': 'Failed to add to favorites',
+      'failed_to_remove_from_favorites': 'Failed to remove from favorites',
+      'failed_to_check_favorite_status': 'Failed to check favorite status',
       'failed_to_remove': 'Failed to remove',
       'failed_to_load_details': 'Failed to load details',
+
+      // Admin
+      'all_users': 'All Users',
+      'no_users_found': 'No users found',
+      'unknown': 'Unknown',
     },
     'uk': {
       // General
@@ -195,7 +212,8 @@ class AppLocalizations {
       'search_movies_hint': 'Пошук фільмів...',
       'search_for_movies': 'Пошук фільмів',
       'no_movies_found': 'Фільми не знайдені',
-      'discover': 'Відкрити',
+      'discover': 'Пошук',
+      'discover_movies': 'Пошук фільмів',
       'movie_details': 'Деталі фільму',
       'overview': 'Огляд',
       'trailers': 'Трейлери',
@@ -205,6 +223,13 @@ class AppLocalizations {
       'add_to_favorites': 'Додати до улюблених',
       'remove_from_favorites': 'Видалити з улюблених',
       'release_label': 'Рік випуску',
+      'filters': 'Фільтри',
+      'clear_all': 'Очистити',
+      'genres': 'Жанри',
+      'release_year': 'Рік випуску',
+      'any_year': 'Будь-який рік',
+      'minimum_rating': 'Мінімальний рейтинг',
+      'apply_filters': 'Застосувати фільтри',
       
       // Profile
       'profile': 'Профіль',
@@ -214,9 +239,20 @@ class AppLocalizations {
       'error_loading_favorites': 'Помилка завантаження улюблених',
       'no_favorites_yet': 'Немає улюблених',
       'tap_heart_to_add_favorites': 'Натисніть на іконку серця на будь-якому фільмі, щоб додати його в улюблені',
+      'added_to_favorites': 'Додано до улюблених',
       'removed_from_favorites': 'Видалено з улюблених',
+      'failed_to_add_to_favorites': 'Не вдалося додати до улюблених',
+      'failed_to_remove_from_favorites': 'Не вдалося видалити з улюблених',
+      'failed_to_check_favorite_status': 'Не вдалося перевірити статус улюбленого',
       'failed_to_remove': 'Не вдалося видалити',
       'failed_to_load_details': 'Не вдалося завантажити деталі',
+
+      // Admin
+      'all_users': 'Всі користувачі',
+      'no_users_found': 'Користувачів не знайдено',
+      'unknown': 'Невідомо',
+      'role_admin': 'Адмін',
+      'role_user': 'Користувач',
     },
   };
 
@@ -301,6 +337,7 @@ class AppLocalizations {
   String get searchForMovies => translate('search_for_movies');
   String get noMoviesFound => translate('no_movies_found');
   String get discover => translate('discover');
+  String get discoverMovies => translate('discover_movies');
   String get movieDetails => translate('movie_details');
   String get overview => translate('overview');
   String get trailers => translate('trailers');
@@ -310,6 +347,13 @@ class AppLocalizations {
   String get addToFavorites => translate('add_to_favorites');
   String get removeFromFavorites => translate('remove_from_favorites');
   String get releaseLabel => translate('release_label');
+  String get filters => translate('filters');
+  String get clearAll => translate('clear_all');
+  String get genres => translate('genres');
+  String get releaseYear => translate('release_year');
+  String get anyYear => translate('any_year');
+  String get minimumRating => translate('minimum_rating');
+  String get applyFilters => translate('apply_filters');
   
   // Profile
   String get profile => translate('profile');
@@ -319,9 +363,20 @@ class AppLocalizations {
   String get errorLoadingFavorites => translate('error_loading_favorites');
   String get noFavoritesYet => translate('no_favorites_yet');
   String get tapHeartToAddFavorites => translate('tap_heart_to_add_favorites');
+  String get addedToFavorites => translate('added_to_favorites');
   String get removedFromFavorites => translate('removed_from_favorites');
+  String get failedToAddToFavorites => translate('failed_to_add_to_favorites');
+  String get failedToRemoveFromFavorites => translate('failed_to_remove_from_favorites');
+  String get failedToCheckFavoriteStatus => translate('failed_to_check_favorite_status');
   String get failedToRemove => translate('failed_to_remove');
   String get failedToLoadDetails => translate('failed_to_load_details');
+
+  // Admin
+  String get allUsers => translate('all_users');
+  String get noUsersFound => translate('no_users_found');
+  String get unknown => translate('unknown');
+  String get roleAdmin => translate('role_admin');
+  String get roleUser => translate('role_user');
 }
 
 class _AppLocalizationsDelegate
