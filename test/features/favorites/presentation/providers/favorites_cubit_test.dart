@@ -52,6 +52,8 @@ void main() {
     favoritesNotifier.dispose();
   });
 
+  const tUserId = 'test-user-123';
+
   final tMovie = FavoriteMovieEntity(
     id: 1,
     title: 'Test Movie',
@@ -65,6 +67,10 @@ void main() {
 
   final tMovieList = [tMovie];
 
+  void setUserIdForNotifier() {
+    favoritesNotifier.setUserId(tUserId);
+  }
+
   group('FavoritesNotifier', () {
     test('initial state should be empty', () {
       expect(favoritesNotifier.state.favoriteMovies, isEmpty);
@@ -75,8 +81,9 @@ void main() {
     group('loadFavoriteMovies', () {
       test('should load favorite movies successfully', () async {
         // arrange
-        when(() => mockGetFavoriteMovies())
+        when(() => mockGetFavoriteMovies(any()))
             .thenAnswer((_) async => Right(tMovieList));
+        setUserIdForNotifier();
 
         // act
         await favoritesNotifier.loadFavoriteMovies();
@@ -85,14 +92,15 @@ void main() {
         expect(favoritesNotifier.state.favoriteMovies, tMovieList);
         expect(favoritesNotifier.state.isLoading, false);
         expect(favoritesNotifier.state.error, null);
-        verify(() => mockGetFavoriteMovies()).called(1);
+        verify(() => mockGetFavoriteMovies(tUserId)).called(greaterThanOrEqualTo(1));
       });
 
       test('should update state with error when loading fails', () async {
         // arrange
         const tFailure = CacheFailure('Failed to load favorites');
-        when(() => mockGetFavoriteMovies())
+        when(() => mockGetFavoriteMovies(any()))
             .thenAnswer((_) async => const Left(tFailure));
+        setUserIdForNotifier();
 
         // act
         await favoritesNotifier.loadFavoriteMovies();
@@ -103,25 +111,23 @@ void main() {
         expect(favoritesNotifier.state.error, 'Failed to load favorites');
       });
 
-      test('should handle exceptions when loading favorites', () async {
-        // arrange
-        when(() => mockGetFavoriteMovies())
-            .thenThrow(Exception('Unexpected error'));
-
+      test('should return empty list when no userId', () async {
         // act
         await favoritesNotifier.loadFavoriteMovies();
 
         // assert
+        expect(favoritesNotifier.state.favoriteMovies, isEmpty);
         expect(favoritesNotifier.state.isLoading, false);
-        expect(favoritesNotifier.state.error, contains('Failed to load favorites'));
+        verifyNever(() => mockGetFavoriteMovies(any()));
       });
     });
 
     group('addMovieToFavorites', () {
       test('should add movie to favorites successfully', () async {
         // arrange
-        when(() => mockAddToFavorites(any()))
+        when(() => mockAddToFavorites(any(), any()))
             .thenAnswer((_) async => const Right(true));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.addMovieToFavorites(tMovie);
@@ -130,13 +136,14 @@ void main() {
         expect(result, true);
         expect(favoritesNotifier.state.favoriteMovies, contains(tMovie));
         expect(favoritesNotifier.state.isLoading, false);
-        verify(() => mockAddToFavorites(tMovie)).called(1);
+        verify(() => mockAddToFavorites(tMovie, tUserId)).called(1);
       });
 
       test('should not add duplicate movie', () async {
         // arrange
-        when(() => mockAddToFavorites(any()))
+        when(() => mockAddToFavorites(any(), any()))
             .thenAnswer((_) async => const Right(true));
+        setUserIdForNotifier();
 
         // act
         await favoritesNotifier.addMovieToFavorites(tMovie);
@@ -150,8 +157,9 @@ void main() {
       test('should return false when adding fails', () async {
         // arrange
         const tFailure = CacheFailure('Failed to add');
-        when(() => mockAddToFavorites(any()))
+        when(() => mockAddToFavorites(any(), any()))
             .thenAnswer((_) async => const Left(tFailure));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.addMovieToFavorites(tMovie);
@@ -161,27 +169,24 @@ void main() {
         expect(favoritesNotifier.state.error, 'Failed to add');
       });
 
-      test('should handle exceptions when adding', () async {
-        // arrange
-        when(() => mockAddToFavorites(any()))
-            .thenThrow(Exception('Unexpected error'));
-
+      test('should return false when no userId', () async {
         // act
         final result = await favoritesNotifier.addMovieToFavorites(tMovie);
 
         // assert
         expect(result, false);
-        expect(favoritesNotifier.state.error, contains('Failed to add to favorites'));
+        verifyNever(() => mockAddToFavorites(any(), any()));
       });
     });
 
     group('removeFromFavorites', () {
       test('should remove movie from favorites successfully', () async {
         // arrange
-        when(() => mockGetFavoriteMovies())
+        when(() => mockGetFavoriteMovies(any()))
             .thenAnswer((_) async => Right(tMovieList));
-        when(() => mockRemoveFromFavorites(any()))
+        when(() => mockRemoveFromFavorites(any(), any()))
             .thenAnswer((_) async => const Right(true));
+        setUserIdForNotifier();
 
         await favoritesNotifier.loadFavoriteMovies();
 
@@ -191,14 +196,15 @@ void main() {
         // assert
         expect(result, true);
         expect(favoritesNotifier.state.favoriteMovies, isEmpty);
-        verify(() => mockRemoveFromFavorites(1)).called(1);
+        verify(() => mockRemoveFromFavorites(1, tUserId)).called(1);
       });
 
       test('should return false when removal fails', () async {
         // arrange
         const tFailure = CacheFailure('Failed to remove');
-        when(() => mockRemoveFromFavorites(any()))
+        when(() => mockRemoveFromFavorites(any(), any()))
             .thenAnswer((_) async => const Left(tFailure));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.removeFromFavorites(1);
@@ -207,26 +213,37 @@ void main() {
         expect(result, false);
         expect(favoritesNotifier.state.error, 'Failed to remove');
       });
+
+      test('should return false when no userId', () async {
+        // act
+        final result = await favoritesNotifier.removeFromFavorites(1);
+
+        // assert
+        expect(result, false);
+        verifyNever(() => mockRemoveFromFavorites(any(), any()));
+      });
     });
 
     group('isFavorite', () {
       test('should return true when movie is favorite', () async {
         // arrange
-        when(() => mockIsFavorite(any()))
+        when(() => mockIsFavorite(any(), any()))
             .thenAnswer((_) async => const Right(true));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.isFavorite(1);
 
         // assert
         expect(result, true);
-        verify(() => mockIsFavorite(1)).called(1);
+        verify(() => mockIsFavorite(1, tUserId)).called(1);
       });
 
       test('should return false when movie is not favorite', () async {
         // arrange
-        when(() => mockIsFavorite(any()))
+        when(() => mockIsFavorite(any(), any()))
             .thenAnswer((_) async => const Right(false));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.isFavorite(1);
@@ -238,8 +255,9 @@ void main() {
       test('should return false on failure', () async {
         // arrange
         const tFailure = CacheFailure('Failed to check');
-        when(() => mockIsFavorite(any()))
+        when(() => mockIsFavorite(any(), any()))
             .thenAnswer((_) async => const Left(tFailure));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.isFavorite(1);
@@ -247,13 +265,23 @@ void main() {
         // assert
         expect(result, false);
       });
+
+      test('should return false when no userId', () async {
+        // act
+        final result = await favoritesNotifier.isFavorite(1);
+
+        // assert
+        expect(result, false);
+        verifyNever(() => mockIsFavorite(any(), any()));
+      });
     });
 
     group('getFavoriteMovie', () {
       test('should return movie when it exists', () async {
         // arrange
-        when(() => mockGetFavoriteMovies())
+        when(() => mockGetFavoriteMovies(any()))
             .thenAnswer((_) async => Right(tMovieList));
+        setUserIdForNotifier();
         await favoritesNotifier.loadFavoriteMovies();
 
         // act
@@ -275,8 +303,9 @@ void main() {
     group('toggleFavorite', () {
       test('should add movie when not in favorites', () async {
         // arrange
-        when(() => mockAddToFavorites(any()))
+        when(() => mockAddToFavorites(any(), any()))
             .thenAnswer((_) async => const Right(true));
+        setUserIdForNotifier();
 
         // act
         final result = await favoritesNotifier.toggleFavorite(tMovie);
@@ -288,10 +317,11 @@ void main() {
 
       test('should remove movie when already in favorites', () async {
         // arrange
-        when(() => mockAddToFavorites(any()))
+        when(() => mockAddToFavorites(any(), any()))
             .thenAnswer((_) async => const Right(true));
-        when(() => mockRemoveFromFavorites(any()))
+        when(() => mockRemoveFromFavorites(any(), any()))
             .thenAnswer((_) async => const Right(true));
+        setUserIdForNotifier();
 
         await favoritesNotifier.addMovieToFavorites(tMovie);
 

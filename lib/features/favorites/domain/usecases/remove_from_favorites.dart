@@ -7,7 +7,7 @@ class RemoveFromFavorites {
 
   RemoveFromFavorites(this.repository);
 
-  Future<Either<Failure, bool>> call(int movieId) async {
-    return await repository.removeFromFavorites(movieId);
+  Future<Either<Failure, bool>> call(int movieId, String userId) async {
+    return await repository.removeFromFavorites(movieId, userId);
   }
 }

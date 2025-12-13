@@ -17,6 +17,8 @@ void main() {
     usecase = GetFavoriteMovies(mockFavoritesRepository);
   });
 
+  const tUserId = 'test-user-123';
+
   final tFavoriteMovies = [
     FavoriteMovieEntity(
       id: 1,
@@ -42,42 +44,42 @@ void main() {
 
   test('should get all favorite movies', () async {
     // arrange
-    when(() => mockFavoritesRepository.getFavoriteMovies())
+    when(() => mockFavoritesRepository.getFavoriteMovies(any()))
         .thenAnswer((_) async => Right(tFavoriteMovies));
 
     // act
-    final result = await usecase();
+    final result = await usecase(tUserId);
 
     // assert
     expect(result, Right(tFavoriteMovies));
-    verify(() => mockFavoritesRepository.getFavoriteMovies()).called(1);
+    verify(() => mockFavoritesRepository.getFavoriteMovies(tUserId)).called(1);
     verifyNoMoreInteractions(mockFavoritesRepository);
   });
 
   test('should return empty list when no favorites exist', () async {
     // arrange
-    when(() => mockFavoritesRepository.getFavoriteMovies())
+    when(() => mockFavoritesRepository.getFavoriteMovies(any()))
         .thenAnswer((_) async => const Right(<FavoriteMovieEntity>[]));
 
     // act
-    final result = await usecase();
+    final result = await usecase(tUserId);
 
     // assert
     expect(result, const Right(<FavoriteMovieEntity>[]));
-    verify(() => mockFavoritesRepository.getFavoriteMovies()).called(1);
+    verify(() => mockFavoritesRepository.getFavoriteMovies(tUserId)).called(1);
   });
 
   test('should return CacheFailure when getting favorites fails', () async {
     // arrange
     const tFailure = CacheFailure('Failed to get favorites');
-    when(() => mockFavoritesRepository.getFavoriteMovies())
+    when(() => mockFavoritesRepository.getFavoriteMovies(any()))
         .thenAnswer((_) async => const Left(tFailure));
 
     // act
-    final result = await usecase();
+    final result = await usecase(tUserId);
 
     // assert
     expect(result, const Left(tFailure));
-    verify(() => mockFavoritesRepository.getFavoriteMovies()).called(1);
+    verify(() => mockFavoritesRepository.getFavoriteMovies(tUserId)).called(1);
   });
 }

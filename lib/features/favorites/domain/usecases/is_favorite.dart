@@ -7,7 +7,7 @@ class IsFavorite {
 
   IsFavorite(this.repository);
 
-  Future<Either<Failure, bool>> call(int movieId) async {
-    return await repository.isFavorite(movieId);
+  Future<Either<Failure, bool>> call(int movieId, String userId) async {
+    return await repository.isFavorite(movieId, userId);
   }
 }

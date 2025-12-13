@@ -8,7 +8,7 @@ class AddToFavorites {
 
   AddToFavorites(this.repository);
 
-  Future<Either<Failure, bool>> call(FavoriteMovieEntity movie) async {
-    return await repository.addToFavorites(movie);
+  Future<Either<Failure, bool>> call(FavoriteMovieEntity movie, String userId) async {
+    return await repository.addToFavorites(movie, userId);
   }
 }

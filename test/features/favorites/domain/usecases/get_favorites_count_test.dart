@@ -17,6 +17,8 @@ void main() {
     usecase = GetFavoritesCount(mockFavoritesRepository);
   });
 
+  const tUserId = 'test-user-123';
+
   test('should get favorites count from repository', () async {
     // arrange
     final tMovies = [
@@ -39,25 +41,25 @@ void main() {
         dateAdded: DateTime.now(),
       ),
     ];
-    when(() => mockFavoritesRepository.getFavoriteMovies())
+    when(() => mockFavoritesRepository.getFavoriteMovies(any()))
         .thenAnswer((_) async => Right(tMovies));
 
     // act
-    final result = await usecase();
+    final result = await usecase(tUserId);
 
     // assert
     expect(result, const Right(2));
-    verify(() => mockFavoritesRepository.getFavoriteMovies()).called(1);
+    verify(() => mockFavoritesRepository.getFavoriteMovies(tUserId)).called(1);
     verifyNoMoreInteractions(mockFavoritesRepository);
   });
 
   test('should return zero when no favorites', () async {
     // arrange
-    when(() => mockFavoritesRepository.getFavoriteMovies())
+    when(() => mockFavoritesRepository.getFavoriteMovies(any()))
         .thenAnswer((_) async => const Right([]));
 
     // act
-    final result = await usecase();
+    final result = await usecase(tUserId);
 
     // assert
     expect(result, const Right(0));
@@ -66,11 +68,11 @@ void main() {
   test('should return CacheFailure when getting count fails', () async {
     // arrange
     const tFailure = CacheFailure('Failed to get count');
-    when(() => mockFavoritesRepository.getFavoriteMovies())
+    when(() => mockFavoritesRepository.getFavoriteMovies(any()))
         .thenAnswer((_) async => const Left(tFailure));
 
     // act
-    final result = await usecase();
+    final result = await usecase(tUserId);
 
     // assert
     expect(result, const Left(tFailure));

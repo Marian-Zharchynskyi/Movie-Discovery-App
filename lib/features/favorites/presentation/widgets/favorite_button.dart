@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:movie_discovery_app/features/favorites/domain/entities/favorite_movie_entity.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
@@ -33,8 +34,16 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkFavoriteStatus();
+      _syncUserAndCheckStatus();
     });
+  }
+
+  void _syncUserAndCheckStatus() {
+    if (!mounted) return;
+    final authState = ref.read(authProvider);
+    final userId = authState.user?.id;
+    ref.read(favoritesProvider.notifier).setUserId(userId);
+    _checkFavoriteStatus();
   }
 
   Future<void> _checkFavoriteStatus() async {

@@ -32,6 +32,8 @@ void main() {
     ),
   ];
 
+  const tUserId = 'test-user-123';
+
   final tFavoriteMovie = FavoriteMovieEntity(
     id: 1,
     title: 'Test Movie',
@@ -58,57 +60,57 @@ void main() {
   group('getFavoriteMovies', () {
     test('should return list of favorite movies from local data source', () async {
       // arrange
-      when(() => mockLocalDataSource.getFavoriteMovies())
+      when(() => mockLocalDataSource.getFavoriteMovies(any()))
           .thenAnswer((_) async => tFavoriteMovies);
 
       // act
-      final result = await repository.getFavoriteMovies();
+      final result = await repository.getFavoriteMovies(tUserId);
 
       // assert
       expect(result, Right(tFavoriteMovies));
-      verify(() => mockLocalDataSource.getFavoriteMovies()).called(1);
+      verify(() => mockLocalDataSource.getFavoriteMovies(tUserId)).called(1);
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
     test('should return CacheFailure when local data source throws exception', () async {
       // arrange
-      when(() => mockLocalDataSource.getFavoriteMovies())
+      when(() => mockLocalDataSource.getFavoriteMovies(any()))
           .thenThrow(CacheException('Failed to get favorites'));
 
       // act
-      final result = await repository.getFavoriteMovies();
+      final result = await repository.getFavoriteMovies(tUserId);
 
       // assert
       expect(result, const Left(CacheFailure('Failed to get favorites')));
-      verify(() => mockLocalDataSource.getFavoriteMovies()).called(1);
+      verify(() => mockLocalDataSource.getFavoriteMovies(tUserId)).called(1);
     });
   });
 
   group('addToFavorites', () {
     test('should add movie to favorites successfully', () async {
       // arrange
-      when(() => mockLocalDataSource.addToFavorites(any()))
+      when(() => mockLocalDataSource.addToFavorites(any(), any()))
           .thenAnswer((_) async => true);
 
       // act
-      final result = await repository.addToFavorites(tFavoriteMovie);
+      final result = await repository.addToFavorites(tFavoriteMovie, tUserId);
 
       // assert
       expect(result, const Right(true));
-      verify(() => mockLocalDataSource.addToFavorites(any())).called(1);
+      verify(() => mockLocalDataSource.addToFavorites(any(), tUserId)).called(1);
     });
 
     test('should return CacheFailure when adding to favorites fails', () async {
       // arrange
-      when(() => mockLocalDataSource.addToFavorites(any()))
+      when(() => mockLocalDataSource.addToFavorites(any(), any()))
           .thenThrow(CacheException('Failed to add to favorites'));
 
       // act
-      final result = await repository.addToFavorites(tFavoriteMovie);
+      final result = await repository.addToFavorites(tFavoriteMovie, tUserId);
 
       // assert
       expect(result, const Left(CacheFailure('Failed to add to favorites')));
-      verify(() => mockLocalDataSource.addToFavorites(any())).called(1);
+      verify(() => mockLocalDataSource.addToFavorites(any(), tUserId)).called(1);
     });
   });
 
@@ -117,28 +119,28 @@ void main() {
 
     test('should remove movie from favorites successfully', () async {
       // arrange
-      when(() => mockLocalDataSource.removeFromFavorites(any()))
+      when(() => mockLocalDataSource.removeFromFavorites(any(), any()))
           .thenAnswer((_) async => true);
 
       // act
-      final result = await repository.removeFromFavorites(tMovieId);
+      final result = await repository.removeFromFavorites(tMovieId, tUserId);
 
       // assert
       expect(result, const Right(true));
-      verify(() => mockLocalDataSource.removeFromFavorites(tMovieId)).called(1);
+      verify(() => mockLocalDataSource.removeFromFavorites(tMovieId, tUserId)).called(1);
     });
 
     test('should return CacheFailure when removing from favorites fails', () async {
       // arrange
-      when(() => mockLocalDataSource.removeFromFavorites(any()))
+      when(() => mockLocalDataSource.removeFromFavorites(any(), any()))
           .thenThrow(CacheException('Failed to remove from favorites'));
 
       // act
-      final result = await repository.removeFromFavorites(tMovieId);
+      final result = await repository.removeFromFavorites(tMovieId, tUserId);
 
       // assert
       expect(result, const Left(CacheFailure('Failed to remove from favorites')));
-      verify(() => mockLocalDataSource.removeFromFavorites(tMovieId)).called(1);
+      verify(() => mockLocalDataSource.removeFromFavorites(tMovieId, tUserId)).called(1);
     });
   });
 
@@ -147,41 +149,41 @@ void main() {
 
     test('should return true when movie is in favorites', () async {
       // arrange
-      when(() => mockLocalDataSource.isFavorite(any()))
+      when(() => mockLocalDataSource.isFavorite(any(), any()))
           .thenAnswer((_) async => true);
 
       // act
-      final result = await repository.isFavorite(tMovieId);
+      final result = await repository.isFavorite(tMovieId, tUserId);
 
       // assert
       expect(result, const Right(true));
-      verify(() => mockLocalDataSource.isFavorite(tMovieId)).called(1);
+      verify(() => mockLocalDataSource.isFavorite(tMovieId, tUserId)).called(1);
     });
 
     test('should return false when movie is not in favorites', () async {
       // arrange
-      when(() => mockLocalDataSource.isFavorite(any()))
+      when(() => mockLocalDataSource.isFavorite(any(), any()))
           .thenAnswer((_) async => false);
 
       // act
-      final result = await repository.isFavorite(tMovieId);
+      final result = await repository.isFavorite(tMovieId, tUserId);
 
       // assert
       expect(result, const Right(false));
-      verify(() => mockLocalDataSource.isFavorite(tMovieId)).called(1);
+      verify(() => mockLocalDataSource.isFavorite(tMovieId, tUserId)).called(1);
     });
 
     test('should return CacheFailure when checking favorite status fails', () async {
       // arrange
-      when(() => mockLocalDataSource.isFavorite(any()))
+      when(() => mockLocalDataSource.isFavorite(any(), any()))
           .thenThrow(CacheException('Failed to check favorite status'));
 
       // act
-      final result = await repository.isFavorite(tMovieId);
+      final result = await repository.isFavorite(tMovieId, tUserId);
 
       // assert
       expect(result, const Left(CacheFailure('Failed to check favorite status')));
-      verify(() => mockLocalDataSource.isFavorite(tMovieId)).called(1);
+      verify(() => mockLocalDataSource.isFavorite(tMovieId, tUserId)).called(1);
     });
   });
 }

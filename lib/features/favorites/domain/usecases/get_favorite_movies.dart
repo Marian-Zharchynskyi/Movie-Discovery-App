@@ -8,7 +8,7 @@ class GetFavoriteMovies {
 
   GetFavoriteMovies(this.repository);
 
-  Future<Either<Failure, List<FavoriteMovieEntity>>> call() async {
-    return await repository.getFavoriteMovies();
+  Future<Either<Failure, List<FavoriteMovieEntity>>> call(String userId) async {
+    return await repository.getFavoriteMovies(userId);
   }
 }

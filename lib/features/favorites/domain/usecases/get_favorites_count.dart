@@ -6,8 +6,8 @@ class GetFavoritesCount {
   final FavoritesRepository repository;
   GetFavoritesCount(this.repository);
 
-  Future<Either<Failure, int>> call() async {
-    final res = await repository.getFavoriteMovies();
+  Future<Either<Failure, int>> call(String userId) async {
+    final res = await repository.getFavoriteMovies(userId);
     return res.fold(
       (l) => Left(l),
       (list) => Right(list.length),

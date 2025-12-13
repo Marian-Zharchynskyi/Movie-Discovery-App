@@ -532,7 +532,12 @@ class $FavoritesTable extends Favorites
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -589,6 +594,7 @@ class $FavoritesTable extends Favorites
   @override
   List<GeneratedColumn> get $columns => [
         id,
+        userId,
         title,
         overview,
         posterPath,
@@ -610,6 +616,14 @@ class $FavoritesTable extends Favorites
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -663,13 +677,15 @@ class $FavoritesTable extends Favorites
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {id, userId};
   @override
   Favorite map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Favorite(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       overview: attachedDatabase.typeMapping
@@ -697,6 +713,7 @@ class $FavoritesTable extends Favorites
 
 class Favorite extends DataClass implements Insertable<Favorite> {
   final int id;
+  final String userId;
   final String title;
   final String overview;
   final String? posterPath;
@@ -707,6 +724,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
   final DateTime dateAdded;
   const Favorite(
       {required this.id,
+      required this.userId,
       required this.title,
       required this.overview,
       this.posterPath,
@@ -719,6 +737,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<String>(userId);
     map['title'] = Variable<String>(title);
     map['overview'] = Variable<String>(overview);
     if (!nullToAbsent || posterPath != null) {
@@ -737,6 +756,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
   FavoritesCompanion toCompanion(bool nullToAbsent) {
     return FavoritesCompanion(
       id: Value(id),
+      userId: Value(userId),
       title: Value(title),
       overview: Value(overview),
       posterPath: posterPath == null && nullToAbsent
@@ -757,6 +777,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Favorite(
       id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
       title: serializer.fromJson<String>(json['title']),
       overview: serializer.fromJson<String>(json['overview']),
       posterPath: serializer.fromJson<String?>(json['posterPath']),
@@ -772,6 +793,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<String>(userId),
       'title': serializer.toJson<String>(title),
       'overview': serializer.toJson<String>(overview),
       'posterPath': serializer.toJson<String?>(posterPath),
@@ -785,6 +807,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
 
   Favorite copyWith(
           {int? id,
+          String? userId,
           String? title,
           String? overview,
           Value<String?> posterPath = const Value.absent(),
@@ -795,6 +818,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
           DateTime? dateAdded}) =>
       Favorite(
         id: id ?? this.id,
+        userId: userId ?? this.userId,
         title: title ?? this.title,
         overview: overview ?? this.overview,
         posterPath: posterPath.present ? posterPath.value : this.posterPath,
@@ -808,6 +832,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
   Favorite copyWithCompanion(FavoritesCompanion data) {
     return Favorite(
       id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
       title: data.title.present ? data.title.value : this.title,
       overview: data.overview.present ? data.overview.value : this.overview,
       posterPath:
@@ -830,6 +855,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
   String toString() {
     return (StringBuffer('Favorite(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('title: $title, ')
           ..write('overview: $overview, ')
           ..write('posterPath: $posterPath, ')
@@ -843,13 +869,14 @@ class Favorite extends DataClass implements Insertable<Favorite> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, overview, posterPath, backdropPath,
-      voteAverage, releaseDate, genreIdsJson, dateAdded);
+  int get hashCode => Object.hash(id, userId, title, overview, posterPath,
+      backdropPath, voteAverage, releaseDate, genreIdsJson, dateAdded);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Favorite &&
           other.id == this.id &&
+          other.userId == this.userId &&
           other.title == this.title &&
           other.overview == this.overview &&
           other.posterPath == this.posterPath &&
@@ -862,6 +889,7 @@ class Favorite extends DataClass implements Insertable<Favorite> {
 
 class FavoritesCompanion extends UpdateCompanion<Favorite> {
   final Value<int> id;
+  final Value<String> userId;
   final Value<String> title;
   final Value<String> overview;
   final Value<String?> posterPath;
@@ -870,8 +898,10 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
   final Value<String> releaseDate;
   final Value<String> genreIdsJson;
   final Value<DateTime> dateAdded;
+  final Value<int> rowid;
   const FavoritesCompanion({
     this.id = const Value.absent(),
+    this.userId = const Value.absent(),
     this.title = const Value.absent(),
     this.overview = const Value.absent(),
     this.posterPath = const Value.absent(),
@@ -880,9 +910,11 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
     this.releaseDate = const Value.absent(),
     this.genreIdsJson = const Value.absent(),
     this.dateAdded = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   FavoritesCompanion.insert({
-    this.id = const Value.absent(),
+    required int id,
+    required String userId,
     required String title,
     required String overview,
     this.posterPath = const Value.absent(),
@@ -891,11 +923,15 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
     this.releaseDate = const Value.absent(),
     this.genreIdsJson = const Value.absent(),
     this.dateAdded = const Value.absent(),
-  })  : title = Value(title),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        userId = Value(userId),
+        title = Value(title),
         overview = Value(overview),
         voteAverage = Value(voteAverage);
   static Insertable<Favorite> custom({
     Expression<int>? id,
+    Expression<String>? userId,
     Expression<String>? title,
     Expression<String>? overview,
     Expression<String>? posterPath,
@@ -904,9 +940,11 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
     Expression<String>? releaseDate,
     Expression<String>? genreIdsJson,
     Expression<DateTime>? dateAdded,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
       if (title != null) 'title': title,
       if (overview != null) 'overview': overview,
       if (posterPath != null) 'poster_path': posterPath,
@@ -915,11 +953,13 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
       if (releaseDate != null) 'release_date': releaseDate,
       if (genreIdsJson != null) 'genre_ids_json': genreIdsJson,
       if (dateAdded != null) 'date_added': dateAdded,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   FavoritesCompanion copyWith(
       {Value<int>? id,
+      Value<String>? userId,
       Value<String>? title,
       Value<String>? overview,
       Value<String?>? posterPath,
@@ -927,9 +967,11 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
       Value<double>? voteAverage,
       Value<String>? releaseDate,
       Value<String>? genreIdsJson,
-      Value<DateTime>? dateAdded}) {
+      Value<DateTime>? dateAdded,
+      Value<int>? rowid}) {
     return FavoritesCompanion(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       title: title ?? this.title,
       overview: overview ?? this.overview,
       posterPath: posterPath ?? this.posterPath,
@@ -938,6 +980,7 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
       releaseDate: releaseDate ?? this.releaseDate,
       genreIdsJson: genreIdsJson ?? this.genreIdsJson,
       dateAdded: dateAdded ?? this.dateAdded,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -946,6 +989,9 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -971,6 +1017,9 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
     if (dateAdded.present) {
       map['date_added'] = Variable<DateTime>(dateAdded.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -978,6 +1027,7 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
   String toString() {
     return (StringBuffer('FavoritesCompanion(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('title: $title, ')
           ..write('overview: $overview, ')
           ..write('posterPath: $posterPath, ')
@@ -985,7 +1035,8 @@ class FavoritesCompanion extends UpdateCompanion<Favorite> {
           ..write('voteAverage: $voteAverage, ')
           ..write('releaseDate: $releaseDate, ')
           ..write('genreIdsJson: $genreIdsJson, ')
-          ..write('dateAdded: $dateAdded')
+          ..write('dateAdded: $dateAdded, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1210,7 +1261,8 @@ class $$MoviesTableOrderingComposer
 }
 
 typedef $$FavoritesTableCreateCompanionBuilder = FavoritesCompanion Function({
-  Value<int> id,
+  required int id,
+  required String userId,
   required String title,
   required String overview,
   Value<String?> posterPath,
@@ -1219,9 +1271,11 @@ typedef $$FavoritesTableCreateCompanionBuilder = FavoritesCompanion Function({
   Value<String> releaseDate,
   Value<String> genreIdsJson,
   Value<DateTime> dateAdded,
+  Value<int> rowid,
 });
 typedef $$FavoritesTableUpdateCompanionBuilder = FavoritesCompanion Function({
   Value<int> id,
+  Value<String> userId,
   Value<String> title,
   Value<String> overview,
   Value<String?> posterPath,
@@ -1230,6 +1284,7 @@ typedef $$FavoritesTableUpdateCompanionBuilder = FavoritesCompanion Function({
   Value<String> releaseDate,
   Value<String> genreIdsJson,
   Value<DateTime> dateAdded,
+  Value<int> rowid,
 });
 
 class $$FavoritesTableTableManager extends RootTableManager<
@@ -1250,6 +1305,7 @@ class $$FavoritesTableTableManager extends RootTableManager<
               $$FavoritesTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String> overview = const Value.absent(),
             Value<String?> posterPath = const Value.absent(),
@@ -1258,9 +1314,11 @@ class $$FavoritesTableTableManager extends RootTableManager<
             Value<String> releaseDate = const Value.absent(),
             Value<String> genreIdsJson = const Value.absent(),
             Value<DateTime> dateAdded = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               FavoritesCompanion(
             id: id,
+            userId: userId,
             title: title,
             overview: overview,
             posterPath: posterPath,
@@ -1269,9 +1327,11 @@ class $$FavoritesTableTableManager extends RootTableManager<
             releaseDate: releaseDate,
             genreIdsJson: genreIdsJson,
             dateAdded: dateAdded,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            required int id,
+            required String userId,
             required String title,
             required String overview,
             Value<String?> posterPath = const Value.absent(),
@@ -1280,9 +1340,11 @@ class $$FavoritesTableTableManager extends RootTableManager<
             Value<String> releaseDate = const Value.absent(),
             Value<String> genreIdsJson = const Value.absent(),
             Value<DateTime> dateAdded = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               FavoritesCompanion.insert(
             id: id,
+            userId: userId,
             title: title,
             overview: overview,
             posterPath: posterPath,
@@ -1291,6 +1353,7 @@ class $$FavoritesTableTableManager extends RootTableManager<
             releaseDate: releaseDate,
             genreIdsJson: genreIdsJson,
             dateAdded: dateAdded,
+            rowid: rowid,
           ),
         ));
 }
@@ -1300,6 +1363,11 @@ class $$FavoritesTableFilterComposer
   $$FavoritesTableFilterComposer(super.$state);
   ColumnFilters<int> get id => $state.composableBuilder(
       column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get userId => $state.composableBuilder(
+      column: $state.table.userId,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1349,6 +1417,11 @@ class $$FavoritesTableOrderingComposer
   $$FavoritesTableOrderingComposer(super.$state);
   ColumnOrderings<int> get id => $state.composableBuilder(
       column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get userId => $state.composableBuilder(
+      column: $state.table.userId,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

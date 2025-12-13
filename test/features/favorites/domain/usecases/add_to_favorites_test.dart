@@ -17,6 +17,8 @@ void main() {
     usecase = AddToFavorites(mockFavoritesRepository);
   });
 
+  const tUserId = 'test-user-123';
+
   final tFavoriteMovie = FavoriteMovieEntity(
     id: 1,
     title: 'Test Movie',
@@ -34,42 +36,42 @@ void main() {
 
   test('should add movie to favorites', () async {
     // arrange
-    when(() => mockFavoritesRepository.addToFavorites(any()))
+    when(() => mockFavoritesRepository.addToFavorites(any(), any()))
         .thenAnswer((_) async => const Right(true));
 
     // act
-    final result = await usecase(tFavoriteMovie);
+    final result = await usecase(tFavoriteMovie, tUserId);
 
     // assert
     expect(result, const Right(true));
-    verify(() => mockFavoritesRepository.addToFavorites(tFavoriteMovie)).called(1);
+    verify(() => mockFavoritesRepository.addToFavorites(tFavoriteMovie, tUserId)).called(1);
     verifyNoMoreInteractions(mockFavoritesRepository);
   });
 
   test('should return CacheFailure when adding to favorites fails', () async {
     // arrange
     const tFailure = CacheFailure('Failed to add to favorites');
-    when(() => mockFavoritesRepository.addToFavorites(any()))
+    when(() => mockFavoritesRepository.addToFavorites(any(), any()))
         .thenAnswer((_) async => const Left(tFailure));
 
     // act
-    final result = await usecase(tFavoriteMovie);
+    final result = await usecase(tFavoriteMovie, tUserId);
 
     // assert
     expect(result, const Left(tFailure));
-    verify(() => mockFavoritesRepository.addToFavorites(tFavoriteMovie)).called(1);
+    verify(() => mockFavoritesRepository.addToFavorites(tFavoriteMovie, tUserId)).called(1);
   });
 
   test('should return false when movie is already in favorites', () async {
     // arrange
-    when(() => mockFavoritesRepository.addToFavorites(any()))
+    when(() => mockFavoritesRepository.addToFavorites(any(), any()))
         .thenAnswer((_) async => const Right(false));
 
     // act
-    final result = await usecase(tFavoriteMovie);
+    final result = await usecase(tFavoriteMovie, tUserId);
 
     // assert
     expect(result, const Right(false));
-    verify(() => mockFavoritesRepository.addToFavorites(tFavoriteMovie)).called(1);
+    verify(() => mockFavoritesRepository.addToFavorites(tFavoriteMovie, tUserId)).called(1);
   });
 }

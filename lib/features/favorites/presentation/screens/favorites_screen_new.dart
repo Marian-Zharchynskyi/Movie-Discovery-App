@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/widgets/favorite_movie_item.dart';
 import 'package:movie_discovery_app/l10n/app_localizations.dart';
@@ -16,8 +17,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadFavorites();
+      _syncUserAndLoadFavorites();
     });
+  }
+
+  void _syncUserAndLoadFavorites() {
+    if (!mounted) return;
+    final authState = ref.read(authProvider);
+    final userId = authState.user?.id;
+    ref.read(favoritesProvider.notifier).setUserId(userId);
   }
 
   Future<void> _loadFavorites() async {

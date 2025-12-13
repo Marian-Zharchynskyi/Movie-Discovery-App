@@ -12,9 +12,9 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   FavoritesRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<Either<Failure, List<FavoriteMovieEntity>>> getFavoriteMovies() async {
+  Future<Either<Failure, List<FavoriteMovieEntity>>> getFavoriteMovies(String userId) async {
     try {
-      final movies = await localDataSource.getFavoriteMovies();
+      final movies = await localDataSource.getFavoriteMovies(userId);
       return Right(movies);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
@@ -22,7 +22,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> addToFavorites(FavoriteMovieEntity movie) async {
+  Future<Either<Failure, bool>> addToFavorites(FavoriteMovieEntity movie, String userId) async {
     try {
       final movieModel = FavoriteMovieModel(
         id: movie.id,
@@ -36,7 +36,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
         dateAdded: DateTime.now(),
       );
 
-      final result = await localDataSource.addToFavorites(movieModel);
+      final result = await localDataSource.addToFavorites(movieModel, userId);
       return Right(result);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
@@ -44,9 +44,9 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> removeFromFavorites(int movieId) async {
+  Future<Either<Failure, bool>> removeFromFavorites(int movieId, String userId) async {
     try {
-      final result = await localDataSource.removeFromFavorites(movieId);
+      final result = await localDataSource.removeFromFavorites(movieId, userId);
       return Right(result);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
@@ -54,9 +54,9 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> isFavorite(int movieId) async {
+  Future<Either<Failure, bool>> isFavorite(int movieId, String userId) async {
     try {
-      final result = await localDataSource.isFavorite(movieId);
+      final result = await localDataSource.isFavorite(movieId, userId);
       return Right(result);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));

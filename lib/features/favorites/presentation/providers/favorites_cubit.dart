@@ -31,11 +31,13 @@ class FavoritesState {
   final List<FavoriteMovieEntity> favoriteMovies;
   final bool isLoading;
   final String? error;
+  final String? userId;
 
   const FavoritesState({
     this.favoriteMovies = const [],
     this.isLoading = false,
     this.error,
+    this.userId,
   });
 
   const FavoritesState.initial() : this();
@@ -44,6 +46,7 @@ class FavoritesState {
     List<FavoriteMovieEntity>? favoriteMovies,
     Object? isLoading = const _Wrapped(null),
     Object? error = const _Wrapped(null),
+    Object? userId = const _Wrapped(null),
   }) {
     return FavoritesState(
       favoriteMovies: favoriteMovies ?? this.favoriteMovies,
@@ -53,6 +56,9 @@ class FavoritesState {
       error: error is _Wrapped
           ? (error.value as String? ?? this.error)
           : error as String?,
+      userId: userId is _Wrapped
+          ? (userId.value as String? ?? this.userId)
+          : userId as String?,
     );
   }
 }
@@ -74,11 +80,26 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
         _isFavorite = isFavorite,
         super(const FavoritesState.initial());
 
+  void setUserId(String? userId) {
+    if (state.userId != userId) {
+      state = state.copyWith(userId: userId, favoriteMovies: []);
+      if (userId != null) {
+        loadFavoriteMovies();
+      }
+    }
+  }
+
   Future<void> loadFavoriteMovies() async {
+    final userId = state.userId;
+    if (userId == null) {
+      state = state.copyWith(favoriteMovies: [], isLoading: false);
+      return;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final result = await _getFavoriteMovies();
+      final result = await _getFavoriteMovies(userId);
 
       result.fold(
         (failure) {
@@ -104,9 +125,12 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
   }
 
   Future<bool> addMovieToFavorites(FavoriteMovieEntity movie) async {
+    final userId = state.userId;
+    if (userId == null) return false;
+
     try {
       state = state.copyWith(isLoading: true, error: null);
-      final result = await _addToFavorites(movie);
+      final result = await _addToFavorites(movie, userId);
 
       return result.fold(
         (failure) {
@@ -138,9 +162,12 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
   }
 
   Future<bool> removeFromFavorites(int movieId) async {
+    final userId = state.userId;
+    if (userId == null) return false;
+
     try {
       state = state.copyWith(isLoading: true, error: null);
-      final result = await _removeFromFavorites(movieId);
+      final result = await _removeFromFavorites(movieId, userId);
 
       return result.fold(
         (failure) {
@@ -170,8 +197,11 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
   }
 
   Future<bool> isFavorite(int movieId) async {
+    final userId = state.userId;
+    if (userId == null) return false;
+
     try {
-      final result = await _isFavorite(movieId);
+      final result = await _isFavorite(movieId, userId);
       return result.fold(
         (failure) {
           state = state.copyWith(error: failure.message);

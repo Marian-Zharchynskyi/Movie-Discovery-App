@@ -25,6 +25,7 @@ class Movies extends Table {
 
 class Favorites extends Table {
   IntColumn get id => integer()();
+  TextColumn get userId => text()();
   TextColumn get title => text()();
   TextColumn get overview => text()();
   TextColumn get posterPath => text().nullable()();
@@ -35,7 +36,7 @@ class Favorites extends Table {
   DateTimeColumn get dateAdded => dateTime().withDefault(currentDateAndTime)();
 
   @override
-  Set<Column> get primaryKey => {id};
+  Set<Column> get primaryKey => {id, userId};
 }
 
 @DriftDatabase(tables: [Movies, Favorites])
@@ -45,7 +46,20 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.memory() => AppDatabase.forTesting(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 2) {
+        await m.deleteTable('favorites');
+        await m.createTable(favorites);
+      }
+    },
+  );
 
   Future<void> upsertMovies(List<MoviesCompanion> entries) async {
     await batch((b) {
@@ -103,27 +117,32 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  Future<bool> removeFromFavorites(int movieId) async {
+  Future<bool> removeFromFavorites(int movieId, String odUserId) async {
     try {
-      final deleted = await (delete(favorites)..where((t) => t.id.equals(movieId))).go();
+      final deleted = await (delete(favorites)
+            ..where((t) => t.id.equals(movieId) & t.userId.equals(odUserId)))
+          .go();
       return deleted > 0;
     } catch (e) {
       throw Exception('Failed to remove from favorites: $e');
     }
   }
 
-  Future<bool> isFavorite(int movieId) async {
+  Future<bool> isFavorite(int movieId, String odUserId) async {
     try {
-      final favorite = await (select(favorites)..where((t) => t.id.equals(movieId))).getSingleOrNull();
+      final favorite = await (select(favorites)
+            ..where((t) => t.id.equals(movieId) & t.userId.equals(odUserId)))
+          .getSingleOrNull();
       return favorite != null;
     } catch (e) {
       throw Exception('Failed to check if favorite: $e');
     }
   }
 
-  Future<List<Map<String, dynamic>>> getFavoriteMovies() async {
+  Future<List<Map<String, dynamic>>> getFavoriteMovies(String odUserId) async {
     try {
       final query = select(favorites)
+        ..where((t) => t.userId.equals(odUserId))
         ..orderBy([(t) => OrderingTerm.desc(t.dateAdded)]);
       
       final results = await query.get();
@@ -157,22 +176,27 @@ class AppDatabase extends _$AppDatabase {
     await into(favorites).insertOnConflictUpdate(entry);
   }
 
-  Future<int> removeFavorite(int id) async {
-    return (delete(favorites)..where((t) => t.id.equals(id))).go();
+  Future<int> removeFavorite(int id, String odUserId) async {
+    return (delete(favorites)
+          ..where((t) => t.id.equals(id) & t.userId.equals(odUserId)))
+        .go();
   }
 
-  Future<bool> isFavoriteId(int id) async {
-    final q = select(favorites)..where((t) => t.id.equals(id));
+  Future<bool> isFavoriteId(int id, String odUserId) async {
+    final q = select(favorites)
+      ..where((t) => t.id.equals(id) & t.userId.equals(odUserId));
     return (await q.getSingleOrNull()) != null;
   }
 
-  Future<List<FavoriteRow>> getAllFavorites() async {
+  Future<List<FavoriteRow>> getAllFavorites(String odUserId) async {
     final rows = await (select(favorites)
+          ..where((t) => t.userId.equals(odUserId))
           ..orderBy([(t) => OrderingTerm(expression: t.dateAdded, mode: OrderingMode.desc)]))
         .get();
     return rows
         .map((r) => FavoriteRow(
               id: r.id,
+              userId: r.userId,
               title: r.title,
               overview: r.overview,
               posterPath: r.posterPath,
@@ -188,6 +212,7 @@ class AppDatabase extends _$AppDatabase {
 
 class FavoriteRow {
   final int id;
+  final String userId;
   final String title;
   final String overview;
   final String? posterPath;
@@ -199,6 +224,7 @@ class FavoriteRow {
 
   FavoriteRow({
     required this.id,
+    required this.userId,
     required this.title,
     required this.overview,
     this.posterPath,

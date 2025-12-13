@@ -33,8 +33,11 @@ void main() {
     dateAdded: DateTime(2024, 1, 1),
   );
 
+  const tUserId = 'test-user-123';
+
   final tFavoriteRow = FavoriteRow(
     id: 1,
+    userId: tUserId,
     title: 'Test Movie',
     overview: 'Test overview',
     posterPath: '/test.jpg',
@@ -52,7 +55,7 @@ void main() {
           .thenAnswer((_) async => 1);
 
       // act
-      final result = await dataSource.addToFavorites(tFavoriteMovie);
+      final result = await dataSource.addToFavorites(tFavoriteMovie, tUserId);
 
       // assert
       expect(result, true);
@@ -66,7 +69,7 @@ void main() {
 
       // act & assert
       expect(
-        () => dataSource.addToFavorites(tFavoriteMovie),
+        () => dataSource.addToFavorites(tFavoriteMovie, tUserId),
         throwsA(isA<CacheException>()),
       );
     });
@@ -77,24 +80,24 @@ void main() {
 
     test('should remove movie from favorites successfully', () async {
       // arrange
-      when(() => mockDatabase.removeFavorite(any()))
+      when(() => mockDatabase.removeFavorite(any(), any()))
           .thenAnswer((_) async => 1);
 
       // act
-      final result = await dataSource.removeFromFavorites(tMovieId);
+      final result = await dataSource.removeFromFavorites(tMovieId, tUserId);
 
       // assert
       expect(result, true);
-      verify(() => mockDatabase.removeFavorite(tMovieId)).called(1);
+      verify(() => mockDatabase.removeFavorite(tMovieId, tUserId)).called(1);
     });
 
     test('should return false when movie not found', () async {
       // arrange
-      when(() => mockDatabase.removeFavorite(any()))
+      when(() => mockDatabase.removeFavorite(any(), any()))
           .thenAnswer((_) async => 0);
 
       // act
-      final result = await dataSource.removeFromFavorites(tMovieId);
+      final result = await dataSource.removeFromFavorites(tMovieId, tUserId);
 
       // assert
       expect(result, false);
@@ -102,12 +105,12 @@ void main() {
 
     test('should throw CacheException when removal fails', () async {
       // arrange
-      when(() => mockDatabase.removeFavorite(any()))
+      when(() => mockDatabase.removeFavorite(any(), any()))
           .thenThrow(Exception('Delete error'));
 
       // act & assert
       expect(
-        () => dataSource.removeFromFavorites(tMovieId),
+        () => dataSource.removeFromFavorites(tMovieId, tUserId),
         throwsA(isA<CacheException>()),
       );
     });
@@ -116,26 +119,26 @@ void main() {
   group('getFavoriteMovies', () {
     test('should return list of favorite movies', () async {
       // arrange
-      when(() => mockDatabase.getAllFavorites())
+      when(() => mockDatabase.getAllFavorites(any()))
           .thenAnswer((_) async => [tFavoriteRow]);
 
       // act
-      final result = await dataSource.getFavoriteMovies();
+      final result = await dataSource.getFavoriteMovies(tUserId);
 
       // assert
       expect(result, isA<List<FavoriteMovieModel>>());
       expect(result.length, 1);
       expect(result[0].title, 'Test Movie');
-      verify(() => mockDatabase.getAllFavorites()).called(1);
+      verify(() => mockDatabase.getAllFavorites(tUserId)).called(1);
     });
 
     test('should return empty list when no favorites', () async {
       // arrange
-      when(() => mockDatabase.getAllFavorites())
+      when(() => mockDatabase.getAllFavorites(any()))
           .thenAnswer((_) async => []);
 
       // act
-      final result = await dataSource.getFavoriteMovies();
+      final result = await dataSource.getFavoriteMovies(tUserId);
 
       // assert
       expect(result, isEmpty);
@@ -143,12 +146,12 @@ void main() {
 
     test('should throw CacheException when retrieval fails', () async {
       // arrange
-      when(() => mockDatabase.getAllFavorites())
+      when(() => mockDatabase.getAllFavorites(any()))
           .thenThrow(Exception('Query error'));
 
       // act & assert
       expect(
-        () => dataSource.getFavoriteMovies(),
+        () => dataSource.getFavoriteMovies(tUserId),
         throwsA(isA<CacheException>()),
       );
     });
@@ -159,24 +162,24 @@ void main() {
 
     test('should return true when movie is favorite', () async {
       // arrange
-      when(() => mockDatabase.isFavoriteId(any()))
+      when(() => mockDatabase.isFavoriteId(any(), any()))
           .thenAnswer((_) async => true);
 
       // act
-      final result = await dataSource.isFavorite(tMovieId);
+      final result = await dataSource.isFavorite(tMovieId, tUserId);
 
       // assert
       expect(result, true);
-      verify(() => mockDatabase.isFavoriteId(tMovieId)).called(1);
+      verify(() => mockDatabase.isFavoriteId(tMovieId, tUserId)).called(1);
     });
 
     test('should return false when movie is not favorite', () async {
       // arrange
-      when(() => mockDatabase.isFavoriteId(any()))
+      when(() => mockDatabase.isFavoriteId(any(), any()))
           .thenAnswer((_) async => false);
 
       // act
-      final result = await dataSource.isFavorite(tMovieId);
+      final result = await dataSource.isFavorite(tMovieId, tUserId);
 
       // assert
       expect(result, false);
@@ -184,12 +187,12 @@ void main() {
 
     test('should throw CacheException when check fails', () async {
       // arrange
-      when(() => mockDatabase.isFavoriteId(any()))
+      when(() => mockDatabase.isFavoriteId(any(), any()))
           .thenThrow(Exception('Query error'));
 
       // act & assert
       expect(
-        () => dataSource.isFavorite(tMovieId),
+        () => dataSource.isFavorite(tMovieId, tUserId),
         throwsA(isA<CacheException>()),
       );
     });

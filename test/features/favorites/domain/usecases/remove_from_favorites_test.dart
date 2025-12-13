@@ -17,45 +17,46 @@ void main() {
   });
 
   const tMovieId = 1;
+  const tUserId = 'test-user-123';
 
   test('should remove movie from favorites', () async {
     // arrange
-    when(() => mockFavoritesRepository.removeFromFavorites(any()))
+    when(() => mockFavoritesRepository.removeFromFavorites(any(), any()))
         .thenAnswer((_) async => const Right(true));
 
     // act
-    final result = await usecase(tMovieId);
+    final result = await usecase(tMovieId, tUserId);
 
     // assert
     expect(result, const Right(true));
-    verify(() => mockFavoritesRepository.removeFromFavorites(tMovieId)).called(1);
+    verify(() => mockFavoritesRepository.removeFromFavorites(tMovieId, tUserId)).called(1);
     verifyNoMoreInteractions(mockFavoritesRepository);
   });
 
   test('should return CacheFailure when removing from favorites fails', () async {
     // arrange
     const tFailure = CacheFailure('Failed to remove from favorites');
-    when(() => mockFavoritesRepository.removeFromFavorites(any()))
+    when(() => mockFavoritesRepository.removeFromFavorites(any(), any()))
         .thenAnswer((_) async => const Left(tFailure));
 
     // act
-    final result = await usecase(tMovieId);
+    final result = await usecase(tMovieId, tUserId);
 
     // assert
     expect(result, const Left(tFailure));
-    verify(() => mockFavoritesRepository.removeFromFavorites(tMovieId)).called(1);
+    verify(() => mockFavoritesRepository.removeFromFavorites(tMovieId, tUserId)).called(1);
   });
 
   test('should return false when movie is not in favorites', () async {
     // arrange
-    when(() => mockFavoritesRepository.removeFromFavorites(any()))
+    when(() => mockFavoritesRepository.removeFromFavorites(any(), any()))
         .thenAnswer((_) async => const Right(false));
 
     // act
-    final result = await usecase(tMovieId);
+    final result = await usecase(tMovieId, tUserId);
 
     // assert
     expect(result, const Right(false));
-    verify(() => mockFavoritesRepository.removeFromFavorites(tMovieId)).called(1);
+    verify(() => mockFavoritesRepository.removeFromFavorites(tMovieId, tUserId)).called(1);
   });
 }

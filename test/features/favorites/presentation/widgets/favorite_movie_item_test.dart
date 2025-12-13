@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:movie_discovery_app/features/favorites/domain/entities/favorite_movie_entity.dart';
 import 'package:movie_discovery_app/features/favorites/presentation/widgets/favorite_movie_item.dart';
+import 'package:movie_discovery_app/l10n/app_localizations.dart';
 
 void main() {
   final tMovie = FavoriteMovieEntity(
@@ -20,6 +22,13 @@ void main() {
   Widget createWidgetUnderTest({VoidCallback? onRemove}) {
     return ProviderScope(
       child: MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: FavoriteMovieItem(
             movie: tMovie,
@@ -34,6 +43,7 @@ void main() {
     testWidgets('should display movie title', (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.text('Test Movie'), findsOneWidget);
@@ -42,6 +52,7 @@ void main() {
     testWidgets('should display movie overview', (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.text('This is a test movie overview'), findsOneWidget);
@@ -50,6 +61,7 @@ void main() {
     testWidgets('should display vote average', (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.text('8.5'), findsOneWidget);
@@ -60,6 +72,7 @@ void main() {
         (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.textContaining('Jan'), findsOneWidget);
@@ -69,6 +82,7 @@ void main() {
     testWidgets('should be dismissible', (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.byType(Dismissible), findsOneWidget);
@@ -78,6 +92,7 @@ void main() {
         (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
       
       // Start swipe but don't complete it
       await tester.drag(find.byType(Dismissible), const Offset(-100, 0));
@@ -97,6 +112,7 @@ void main() {
 
       // act
       await tester.pumpWidget(createWidgetUnderTest(onRemove: onRemove));
+      await tester.pumpAndSettle();
       await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
       await tester.pumpAndSettle();
 
@@ -108,6 +124,7 @@ void main() {
         (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.byType(Card), findsOneWidget);
@@ -119,6 +136,7 @@ void main() {
         (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.byType(Hero), findsOneWidget);
@@ -129,12 +147,13 @@ void main() {
     testWidgets('should be tappable', (WidgetTester tester) async {
       // act
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
       // assert
       expect(find.byType(InkWell), findsOneWidget);
     });
 
-    testWidgets('should display N/A for empty release date',
+    testWidgets('should display Unknown for empty release date',
         (WidgetTester tester) async {
       // arrange
       final movieWithoutDate = FavoriteMovieEntity(
@@ -153,15 +172,23 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: FavoriteMovieItem(movie: movieWithoutDate),
             ),
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // assert
-      expect(find.text('N/A'), findsOneWidget);
+      expect(find.text('Unknown'), findsOneWidget);
     });
   });
 }

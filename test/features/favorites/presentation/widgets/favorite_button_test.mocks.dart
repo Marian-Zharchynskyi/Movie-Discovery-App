@@ -100,6 +100,15 @@ class MockFavoritesNotifier extends _i1.Mock implements _i2.FavoritesNotifier {
       ) as bool);
 
   @override
+  void setUserId(String? userId) => super.noSuchMethod(
+        Invocation.method(
+          #setUserId,
+          [userId],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   _i4.Future<void> loadFavoriteMovies() => (super.noSuchMethod(
         Invocation.method(
           #loadFavoriteMovies,

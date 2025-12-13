@@ -6,6 +6,7 @@ void main() {
     test('FavoriteRow holds values', () {
       final row = FavoriteRow(
         id: 1,
+        userId: 'test-user-123',
         title: 'Title',
         overview: 'Overview',
         posterPath: 'p.jpg',
@@ -17,6 +18,7 @@ void main() {
       );
 
       expect(row.id, 1);
+      expect(row.userId, 'test-user-123');
       expect(row.title, 'Title');
       expect(row.voteAverage, 8.5);
     });

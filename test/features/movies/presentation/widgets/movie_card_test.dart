@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +10,11 @@ import 'package:movie_discovery_app/features/auth/domain/usecases/sign_in.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_out.dart';
 import 'package:movie_discovery_app/features/auth/domain/usecases/sign_up.dart';
 import 'package:movie_discovery_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/add_to_favorites.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/get_favorite_movies.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/is_favorite.dart';
+import 'package:movie_discovery_app/features/favorites/domain/usecases/remove_from_favorites.dart';
+import 'package:movie_discovery_app/features/favorites/presentation/providers/favorites_cubit.dart';
 import 'package:movie_discovery_app/features/movies/domain/entities/movie_entity.dart';
 import 'package:movie_discovery_app/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movie_discovery_app/shared/widgets/rating_stars.dart';
@@ -22,6 +28,10 @@ class MockSignIn extends Mock implements SignIn {}
 class MockSignUp extends Mock implements SignUp {}
 class MockSignOut extends Mock implements SignOut {}
 class MockGetCurrentUser extends Mock implements GetCurrentUser {}
+class MockGetFavoriteMovies extends Mock implements GetFavoriteMovies {}
+class MockAddToFavorites extends Mock implements AddToFavorites {}
+class MockRemoveFromFavorites extends Mock implements RemoveFromFavorites {}
+class MockIsFavorite extends Mock implements IsFavorite {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
@@ -29,6 +39,10 @@ void main() {
   late MockSignUp mockSignUp;
   late MockSignOut mockSignOut;
   late MockGetCurrentUser mockGetCurrentUser;
+  late MockGetFavoriteMovies mockGetFavoriteMovies;
+  late MockAddToFavorites mockAddToFavorites;
+  late MockRemoveFromFavorites mockRemoveFromFavorites;
+  late MockIsFavorite mockIsFavorite;
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
@@ -36,6 +50,17 @@ void main() {
     mockSignUp = MockSignUp();
     mockSignOut = MockSignOut();
     mockGetCurrentUser = MockGetCurrentUser();
+    mockGetFavoriteMovies = MockGetFavoriteMovies();
+    mockAddToFavorites = MockAddToFavorites();
+    mockRemoveFromFavorites = MockRemoveFromFavorites();
+    mockIsFavorite = MockIsFavorite();
+
+    when(() => mockGetCurrentUser()).thenAnswer(
+      (_) async => const Right(null),
+    );
+    when(() => mockIsFavorite(any(), any())).thenAnswer(
+      (_) async => const Right(false),
+    );
   });
 
   const tMovie = MovieEntity(
@@ -60,6 +85,10 @@ void main() {
             authRepository: mockAuthRepository,
           );
         }),
+        getFavoriteMoviesProvider.overrideWithValue(mockGetFavoriteMovies),
+        addToFavoritesProvider.overrideWithValue(mockAddToFavorites),
+        removeFromFavoritesProvider.overrideWithValue(mockRemoveFromFavorites),
+        isFavoriteProvider.overrideWithValue(mockIsFavorite),
       ],
       child: const MaterialApp(
         home: Scaffold(
@@ -122,6 +151,10 @@ void main() {
               authRepository: mockAuthRepository,
             );
           }),
+          getFavoriteMoviesProvider.overrideWithValue(mockGetFavoriteMovies),
+          addToFavoritesProvider.overrideWithValue(mockAddToFavorites),
+          removeFromFavoritesProvider.overrideWithValue(mockRemoveFromFavorites),
+          isFavoriteProvider.overrideWithValue(mockIsFavorite),
         ],
         child: const MaterialApp(
           home: Scaffold(
